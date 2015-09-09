@@ -711,3 +711,218 @@ my.list[["b"]][1]
 # We can think of data frames as a list of vectors;
 # This is what allows us to use the $ operator to extract data from dfs!
 ```
+
+
+### Appendix B5
+Sorting
+
+```r
+e <- c(5,4,2,3,1)
+sort(e); sort(e, decreasing = T)
+```
+
+```
+## [1] 1 2 3 4 5
+```
+
+```
+## [1] 5 4 3 2 1
+```
+
+```r
+# If we want to sort all the rows of a data frame, keeping records (rows) intact, we can use order. This function is a little tricky, so we explore its use in a vector.
+e; order(e); e[order(e)] # Order is generating the index to give us the sorted vector
+```
+
+```
+## [1] 5 4 2 3 1
+```
+
+```
+## [1] 5 3 4 2 1
+```
+
+```
+## [1] 1 2 3 4 5
+```
+
+```r
+# This becomes a little clearer with a df 
+
+dat
+```
+
+```
+##          species treatment height width
+## 1    S.altissima   Control    1.1   1.0
+## 2       S.rugosa     Water    0.8   1.7
+## 3 E.graminifolia   Control    0.9   0.6
+## 4     A. pilosus     Water    1.0   0.2
+```
+
+```r
+order(dat$height)
+```
+
+```
+## [1] 2 3 4 1
+```
+
+```r
+dat[order(dat$height), ] # The width is in order!
+```
+
+```
+##          species treatment height width
+## 2       S.rugosa     Water    0.8   1.7
+## 3 E.graminifolia   Control    0.9   0.6
+## 4     A. pilosus     Water    1.0   0.2
+## 1    S.altissima   Control    1.1   1.0
+```
+
+```r
+dat[rev(order(dat$height)), ] # The width is reversed!
+```
+
+```
+##          species treatment height width
+## 1    S.altissima   Control    1.1   1.0
+## 4     A. pilosus     Water    1.0   0.2
+## 3 E.graminifolia   Control    0.9   0.6
+## 2       S.rugosa     Water    0.8   1.7
+```
+
+### Appendix B6
+Skipping for now. 
+
+### Appendix B7
+#### Appendix B7.1
+Read through [Hadley's Tidy Data paper](http://www.jstatsoft.org/v59/i10/paper)
+
+```r
+summary(CO2)
+```
+
+```
+##      Plant             Type         Treatment       conc     
+##  Qn1    : 7   Quebec     :42   nonchilled:42   Min.   :  95  
+##  Qn2    : 7   Mississippi:42   chilled   :42   1st Qu.: 175  
+##  Qn3    : 7                                    Median : 350  
+##  Qc1    : 7                                    Mean   : 435  
+##  Qc3    : 7                                    3rd Qu.: 675  
+##  Qc2    : 7                                    Max.   :1000  
+##  (Other):42                                                  
+##      uptake     
+##  Min.   : 7.70  
+##  1st Qu.:17.90  
+##  Median :28.30  
+##  Mean   :27.21  
+##  3rd Qu.:37.12  
+##  Max.   :45.50  
+## 
+```
+
+```r
+head(CO2)
+```
+
+```
+##   Plant   Type  Treatment conc uptake
+## 1   Qn1 Quebec nonchilled   95   16.0
+## 2   Qn1 Quebec nonchilled  175   30.4
+## 3   Qn1 Quebec nonchilled  250   34.8
+## 4   Qn1 Quebec nonchilled  350   37.2
+## 5   Qn1 Quebec nonchilled  500   35.3
+## 6   Qn1 Quebec nonchilled  675   39.2
+```
+
+We want to convert these such that the `conc` factor is just split into new columns
+
+
+```r
+CO2.wide <- reshape(CO2, v.names = "uptake", idvar = "Plant", timevar = "conc", direction = "wide")
+names(CO2.wide)
+```
+
+```
+##  [1] "Plant"       "Type"        "Treatment"   "uptake.95"   "uptake.175" 
+##  [6] "uptake.250"  "uptake.350"  "uptake.500"  "uptake.675"  "uptake.1000"
+```
+
+```r
+# To go back to long format:
+CO2.long <- reshape(CO2.wide, v.names = "Uptake", 
+                    varying = list(4:10), timevar = "Concentration", 
+                    times = c(95, 175, 250, 350, 500, 675, 1000))
+```
+
+#### Appendix B7.2
+Summarising by groups
+
+
+```r
+# First argument is the column to be summarised; second is column identifying group belonging; third is the function
+tapply(CO2[[,"uptake"]], list(CO2[["Treatment"]]), mean)
+```
+
+```
+## Error in `[[.data.frame`(CO2, , "uptake"): argument "..1" is missing, with no default
+```
+
+```r
+# Summarizing by treatment AND type
+tapply(CO2[["uptake"]], list(CO2[["Treatment"]], CO2[["Type"]]), sd)
+```
+
+```
+##              Quebec Mississippi
+## nonchilled 9.596371    7.402136
+## chilled    9.644823    4.058976
+```
+
+```r
+# `aggregate` allows us to summarize multiple columns at once: 
+aggregate(CO2[, 4:5], list(Plant = CO2[["Plant"]]), mean)
+```
+
+```
+##    Plant conc   uptake
+## 1    Qn1  435 33.22857
+## 2    Qn2  435 35.15714
+## 3    Qn3  435 37.61429
+## 4    Qc1  435 29.97143
+## 5    Qc3  435 32.58571
+## 6    Qc2  435 32.70000
+## 7    Mn3  435 24.11429
+## 8    Mn2  435 27.34286
+## 9    Mn1  435 26.40000
+## 10   Mc2  435 12.14286
+## 11   Mc3  435 17.30000
+## 12   Mc1  435 18.00000
+```
+
+*Note to self*: Redo this using `reshape2` at some point. 
+
+### Appendix B8
+Reading into and Writing out from R
+
+
+```r
+dat <- data.frame(Name = rep(c("Control", "Treatment"),
+                             each = 5), First = runif(10), Second = rnorm(1))
+
+# Spitting out dfs to the current wd
+write.table(dat, file = "dat.txt")
+write.csv(dat, file = "dat.csv")
+
+# Reading it back in
+dat.new <- read.csv("dat.csv")
+dat.new2 <- read.table("dat.txt", header = TRUE)
+
+# Spitting out some analyses:
+mod.out <- summary(aov(First ~ Name, data = dat))
+mod.out[[1]]
+write.csv(mod.out[[1]], "ModelANOVA.csv")
+```
+
+
