@@ -522,7 +522,11 @@ M [1, ]; M[1, 1:2] # Both are equivalent
 ## [1] 1 3
 ```
 
-Skipping "Simple Matrix Algebra" for now. 
+
+*Skipping "Simple Matrix Algebra" for now.*
+
+------------------------------------
+**The rest of this is not part of the assignment, just did it to work through the latter sections like ODEs and Optimizations**
 
 #### Appendix B3.5
 Data frames: two dimensionsal, like matrices, but can store multiple types of data, unlike matrices...
@@ -947,16 +951,16 @@ myplot
 
 ```
 ## $breaks
-## [1]  0  5 10 15 20 25
+## [1] -5  0  5 10 15 20 25
 ## 
 ## $counts
-## [1] 3 8 6 2 1
+## [1] 2 0 5 5 5 3
 ## 
 ## $density
-## [1] 0.03 0.08 0.06 0.02 0.01
+## [1] 0.02 0.00 0.05 0.05 0.05 0.03
 ## 
 ## $mids
-## [1]  2.5  7.5 12.5 17.5 22.5
+## [1] -2.5  2.5  7.5 12.5 17.5 22.5
 ## 
 ## $xname
 ## [1] "rnorm(20, m = 11, sd = 6)"
@@ -1075,3 +1079,143 @@ out
 ## 2 3529.29 200 NaN
 ```
 
+### Appendix B11
+Numerical optimization
+
+We need to perform numerical optimization when we think that a model might describe a system, but we don't know the parameters values for the model. 
+ 
+From the text:  
+Once you have a model of the reality you want to describe, the basic steps
+toward optimization we consider are (i) create an *objective function*, (ii) use
+a routine to *minimize (or maximize) the objective function through optimal
+choice of parameter values*, and (iii) see if the “optimal” parameters values make
+sense, and perhaps refine and interpret them.
+
+An objective function compares the data to the predicted values from the
+model, and returns a quantitative measure of their difference. (e.g. Least Squares, ML). 
+
+In Maximum Liklihood, we use a pdf and try to tweak its parameters and calculate the probability of observing some data. "In other words, we pretend that the model and the predicted values are true, measure how far off each datum is from the predicted value, and then use a probability distribution to calculate the probability of seeing each datum." [...] "An optimization routine then tries to find model parameters that maximize this likelihood."
+
+`R`'s functions `optimize`, `optim` and `bbmle::mle2` are the ones explored here- the first used when we are estimating just a single parameter. 
+
+
+```r
+# In this scenario, we have a vector y and are estimating the mean
+
+y <- c(1, 0:10)
+
+# Define an optimization function -- here, the square differences between datum and mean are computed
+f <- function(y, mu) {
+  sum((y-mu)^2)
+}
+
+# If we guess a value for mu...
+guesses <- seq(from = 4, to = 6, by = 0.05)
+
+squared_diffs <- sapply(guesses, function(i) f(y, i))
+
+plot(squared_diffs~guesses, type = "l")
+```
+
+![plot of chunk unnamed-chunk-23](figure/unnamed-chunk-23-1.png) 
+
+This procedure can be achieved with `optimize` in `R`.
+
+
+```r
+optimize(f = f, interval = c(0, 10), y = y)
+```
+
+```
+## $minimum
+## [1] 4.666667
+## 
+## $objective
+## [1] 124.6667
+```
+
+Optimizing using maximum likelihood is similar, but we minimize the negative logarithm of the likelihood. Note that we use the normal pdf here because we assume that the data themselves are normally distributed
+
+
+```r
+LL <- function(mu, SD) {
+  -sum(dnorm(y, mean = mu, sd = SD, log = T))
+}
+
+# We use the optimization routine mle2 in bbmle:
+
+library(bbmle)
+# Equivalent calls:
+# fit <- mle2(y ~ dnorm(mu, sd = SD), start = list(mu = 5, SD = 1)))
+fit <- mle2(LL, start = list(mu = 5, SD = 1), control = list(maxit = 10^5))
+```
+
+```
+## Warning in dnorm(y, mean = mu, sd = SD, log = T): NaNs produced
+```
+
+```
+## Warning in dnorm(y, mean = mu, sd = SD, log = T): NaNs produced
+```
+
+```r
+summary(fit)
+```
+
+```
+## Maximum likelihood estimation
+## 
+## Call:
+## mle2(minuslogl = LL, start = list(mu = 5, SD = 1), control = list(maxit = 10^5))
+## 
+## Coefficients:
+##    Estimate Std. Error z value     Pr(z)    
+## mu  4.66672    0.93038  5.0159 5.278e-07 ***
+## SD  3.22294    0.65781  4.8995 9.606e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## -2 log L: 62.14337
+```
+
+```r
+pr <- profile(fit)
+```
+
+```
+## Warning in dnorm(y, mean = mu, sd = SD, log = T): NaNs produced
+```
+
+```
+## Warning in dnorm(y, mean = mu, sd = SD, log = T): NaNs produced
+```
+
+```
+## Warning in dnorm(y, mean = mu, sd = SD, log = T): NaNs produced
+```
+
+```
+## Warning in dnorm(y, mean = mu, sd = SD, log = T): NaNs produced
+```
+
+```r
+plot(pr)
+```
+
+![plot of chunk unnamed-chunk-25](figure/unnamed-chunk-25-1.png) 
+
+*Note to self*: work through disease modeling example in chapter 6. 
+
+### Appendix B12
+Derivatives in R
+
+
+```r
+host1 <- expression(R * H * (1 + a * P)^-k)
+# derive with respect to H
+D(host1, "H")
+```
+
+```
+## R * (1 + a * P)^-k
+```
