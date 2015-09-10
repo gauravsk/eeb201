@@ -10,6 +10,7 @@ toc: yes
 This section focuses on using R's help functions.
 
 ```r
+set.seed(9123)
 ### When you know a function name ----
 ?mean
 
@@ -168,39 +169,23 @@ Y
 ```
 
 ```r
-sum(Y)
+sum(Y); mean(Y); max(Y); length(Y); summary(Y)
 ```
 
 ```
 ## [1] 105.4
 ```
 
-```r
-mean(Y)
-```
-
 ```
 ## [1] 10.54
-```
-
-```r
-max(Y)
 ```
 
 ```
 ## [1] 11.4
 ```
 
-```r
-length(Y)
-```
-
 ```
 ## [1] 10
-```
-
-```r
-summary(Y)
 ```
 
 ```
@@ -511,7 +496,7 @@ M [1, 2] # First row; second col
 ```
 
 ```r
-M [1, ]; M[1, 1:2] # Both are equivalent
+M [1, ]; M[1, 1:2] # Both are equivalent because there's just two columns anyway
 ```
 
 ```
@@ -524,6 +509,15 @@ M [1, ]; M[1, 1:2] # Both are equivalent
 
 
 *Skipping "Simple Matrix Algebra" for now.*
+
+### Appendix B3.4
+Matrix algebra
+
+Recall the difference between scalar and matrix operations...
+
+Given two matrices *A* and *B*:
+
+$\begin{matrix}a & b\\c & d\end{matrix}$
 
 ------------------------------------
 **The rest of this is not part of the assignment, just did it to work through the latter sections like ODEs and Optimizations**
@@ -951,16 +945,16 @@ myplot
 
 ```
 ## $breaks
-## [1] -5  0  5 10 15 20 25
+## [1]  6  8 10 12 14 16 18 20 22
 ## 
 ## $counts
-## [1] 2 0 5 5 5 3
+## [1] 2 2 3 5 3 3 1 1
 ## 
 ## $density
-## [1] 0.02 0.00 0.05 0.05 0.05 0.03
+## [1] 0.050 0.050 0.075 0.125 0.075 0.075 0.025 0.025
 ## 
 ## $mids
-## [1] -2.5  2.5  7.5 12.5 17.5 22.5
+## [1]  7  9 11 13 15 17 19 21
 ## 
 ## $xname
 ## [1] "rnorm(20, m = 11, sd = 6)"
