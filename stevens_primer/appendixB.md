@@ -3,6 +3,7 @@ title: "Appendix B from Primer of Ecology w/ R"
 author: "Gaurav Kandlikar"
 date: "September 6, 2015"
 output: html_document
+toc: yes
 ---
 
 ### Appendix B1
@@ -925,4 +926,152 @@ mod.out[[1]]
 write.csv(mod.out[[1]], "ModelANOVA.csv")
 ```
 
+### Apppendix B9
+Probability distributions and Randomization
+
+There are many probability functions in r: `rnorm`, `dnorm`, `pnorm`, `qnorm`,...
+
+
+```r
+qnorm(p = c(0.025, 0.975))
+```
+
+```
+## [1] -1.959964  1.959964
+```
+
+```r
+myplot <- hist(rnorm(20, m = 11, sd = 6), probability = TRUE)
+myplot
+```
+
+```
+## $breaks
+## [1]  0  5 10 15 20 25
+## 
+## $counts
+## [1] 3 8 6 2 1
+## 
+## $density
+## [1] 0.03 0.08 0.06 0.02 0.01
+## 
+## $mids
+## [1]  2.5  7.5 12.5 17.5 22.5
+## 
+## $xname
+## [1] "rnorm(20, m = 11, sd = 6)"
+## 
+## $equidist
+## [1] TRUE
+## 
+## attr(,"class")
+## [1] "histogram"
+```
+
+```r
+lines(myplot$mids, dnorm(myplot$mids, m = 11, sd = 6)) # This is the pdf
+```
+
+![plot of chunk unnamed-chunk-19](figure/unnamed-chunk-19-1.png) 
+
+### Appendix B10
+Numerical integration of ODEs using `desolve`
+
+
+```r
+library(deSolve)
+logGrowth <- function(t, y, p) {
+  N <- y[1]
+  with(as.list(p), {
+    dN.dt <- r * N * (1 - a * N) 
+    return(list(dN.dt))
+  })
+}
+
+p <- c(r = 1, a = 0.001) # The parameters
+y0 <- c(N = 10) # Init N
+t <- 1:20 # Number of time steps
+
+out <- ode(y = y0, times = t, func = logGrowth, parms = p)
+head(out)
+```
+
+```
+##      time         N
+## [1,]    1  10.00000
+## [2,]    2  26.72369
+## [3,]    3  69.45310
+## [4,]    4 168.66426
+## [5,]    5 355.46079
+## [6,]    6 599.85982
+```
+
+Modeling two species competition
+
+```r
+LVComp <- function(t, y, p) {
+  N <- y
+
+  with(as.list(p), {
+    dN1.dt <- r[1] * N[1] * (1 - a[1, 1] * N[1] - a[1, 2] * N[2])
+    dN2.dt <- r[2] * N[2] * (1 - a[2, 1] * N[1] - a[2, 2] * N[2])
+    
+    return(list(c(dN1.dt, dN2.dt)))
+  })
+}
+
+# Specify start conditions in the format required by the function
+
+a <- matrix(c(0.02, 0.01, 0.01, 0.03), nrow = 2)
+r <- c(1, 1)
+p2 <- list(r, a)
+N0 <- c(10, 10)
+
+t2 <- c(1, 5, 10, 20)
+out <- ode(y = N0, times = t2, func = LVComp, parms = p2)
+out[1:4, ]
+```
+
+```
+##      time        1        2
+## [1,]    1 10.00000 10.00000
+## [2,]    5 35.53914 21.79929
+## [3,]   10 39.61141 20.35672
+## [4,]   20 39.99332 20.00667
+```
+*Note to self*: Keep in mind `hmax` which can make the function take a big step
+`lsodar` returns roots to ODEs if they exist:
+
+
+```r
+EV <- function(t, y, p) {
+  
+  with(as.list(p), {
+    dv.dt <- b * y[1] * (1 - 0.005 * y[1]) 
+    a * y[1] * y[2]
+    de.dt <- a * e * y[1] * y[2] - s * y[2]
+    return(list(c(dv.dt, de.dt)))
+  })
+}
+
+# The rootfun checks whether the difference between the last few entries is less than some small number - here, 1e-10
+rootfun <- function(t, y, p) {
+  dstate <- unlist(EV(t, y, p))
+  return(sum(abs(dstate)) - 1e-10)
+}
+
+# Set the function inputs
+p <- c(b = 0.5, a = 0.02, e = 0.1, s = 0.2)
+t <- c(0, 1e+10) # The time is set to a large number so the rootfun has all the time it needs to find an equilibrium
+
+# Run function
+out <- ode(y = c(45, 200), t, EV, parms = p, rootfun = rootfun, method = "lsodar")
+out
+```
+
+```
+##      time   1   2
+## 1    0.00  45 200
+## 2 3529.29 200 NaN
+```
 
