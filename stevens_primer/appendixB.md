@@ -4,13 +4,14 @@ author: "Gaurav Kandlikar"
 date: "September 6, 2015"
 output: html_document
 toc: yes
+
 ---
 
 ### Appendix B1
 This section focuses on using R's help functions.
 
 ```r
-set.seed(9123)
+set.seed(9123) # dont want to make new graphs each time
 ### When you know a function name ----
 ?mean
 
@@ -74,31 +75,19 @@ Vectors
 Y <- c(8.3, 8.6, 10.7, 10.8, 11, 11, 11.1, 11.2,11.3, 11.4)
 
 # Creating sequences of numbers
-1:4
+1:4; 4:1; -1:3; -(1:3) # minus sign outside acts as a function
 ```
 
 ```
 ## [1] 1 2 3 4
 ```
 
-```r
-4:1
-```
-
 ```
 ## [1] 4 3 2 1
 ```
 
-```r
--1:3
-```
-
 ```
 ## [1] -1  0  1  2  3
-```
-
-```r
--(1:3) # minus sign outside acts as a function
 ```
 
 ```
@@ -266,8 +255,7 @@ Y[Y > mean(Y)]
 Vector algebra
 
 ```r
-a <- 1:3
-b <- 4:6
+a <- 1:3; b <- 4:6
 
 # Play with two vectors of equal lengths
 a + b
@@ -508,17 +496,98 @@ M [1, ]; M[1, 1:2] # Both are equivalent because there's just two columns anyway
 ```
 
 
-*Skipping "Simple Matrix Algebra" for now.*
-
 ### Appendix B3.4
 Matrix algebra
 
 Recall the difference between scalar and matrix operations...
 
-Given two matrices *A* and *B*:
+Given two matrices *A* and *B*, we can do element-wise (i.e. scalar) multiplication:
+![](matrix/element_wise_multi.png)
+or we can do matrix multiplication:
+![](matrix/matrix_multi.png)
 
-$\begin{matrix}a & b\\c & d\end{matrix}$
+```r
+M <- matrix(1:4, nrow = 2)
+N <- matrix(0:3, nrow = 2)
 
+M*N
+```
+
+```
+##      [,1] [,2]
+## [1,]    0    6
+## [2,]    2   12
+```
+
+```r
+# Matrix multiplication
+M %*% N; N %*% M # Non-commutative operation
+```
+
+```
+##      [,1] [,2]
+## [1,]    3   11
+## [2,]    4   16
+```
+
+```
+##      [,1] [,2]
+## [1,]    4    8
+## [2,]    7   15
+```
+
+```r
+# We can multiply by other dimensional vectors (as long as one dimension matches)
+M %*% c(1,2); c(1,2) %*% M
+```
+
+```
+##      [,1]
+## [1,]    7
+## [2,]   10
+```
+
+```
+##      [,1] [,2]
+## [1,]    5   11
+```
+
+```r
+# But this won't work:
+M %*% c(1,2,3)
+```
+
+```
+## Error in M %*% c(1, 2, 3): non-conformable arguments
+```
+
+```r
+# Matrix addition
+M + N; M + 2
+```
+
+```
+##      [,1] [,2]
+## [1,]    1    5
+## [2,]    3    7
+```
+
+```
+##      [,1] [,2]
+## [1,]    3    5
+## [2,]    4    6
+```
+
+```r
+# Transpose
+t(M) # So don't use `t` as a variable name!
+```
+
+```
+##      [,1] [,2]
+## [1,]    1    2
+## [2,]    3    4
+```
 ------------------------------------
 **The rest of this is not part of the assignment, just did it to work through the latter sections like ODEs and Optimizations**
 
@@ -630,7 +699,7 @@ levels(Treatment)
 stripchart(1:9 ~ Treatment)
 ```
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
+![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png) 
 
 ```r
 # We can force levels to be different:
@@ -639,7 +708,7 @@ Treatment <- factor(rep(c("Control", "Medium", "High"), each = 3),
 stripchart(1:9 ~ Treatment)
 ```
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-2.png) 
+![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-2.png) 
 
 #### Appendix B3.6
 Lists are just globs of objects...
@@ -970,7 +1039,7 @@ myplot
 lines(myplot$mids, dnorm(myplot$mids, m = 11, sd = 6)) # This is the pdf
 ```
 
-![plot of chunk unnamed-chunk-19](figure/unnamed-chunk-19-1.png) 
+![plot of chunk unnamed-chunk-20](figure/unnamed-chunk-20-1.png) 
 
 ### Appendix B10
 Numerical integration of ODEs using `desolve`
@@ -1111,7 +1180,7 @@ squared_diffs <- sapply(guesses, function(i) f(y, i))
 plot(squared_diffs~guesses, type = "l")
 ```
 
-![plot of chunk unnamed-chunk-23](figure/unnamed-chunk-23-1.png) 
+![plot of chunk unnamed-chunk-24](figure/unnamed-chunk-24-1.png) 
 
 This procedure can be achieved with `optimize` in `R`.
 
@@ -1139,6 +1208,13 @@ LL <- function(mu, SD) {
 # We use the optimization routine mle2 in bbmle:
 
 library(bbmle)
+```
+
+```
+## Loading required package: stats4
+```
+
+```r
 # Equivalent calls:
 # fit <- mle2(y ~ dnorm(mu, sd = SD), start = list(mu = 5, SD = 1)))
 fit <- mle2(LL, start = list(mu = 5, SD = 1), control = list(maxit = 10^5))
@@ -1196,7 +1272,7 @@ pr <- profile(fit)
 plot(pr)
 ```
 
-![plot of chunk unnamed-chunk-25](figure/unnamed-chunk-25-1.png) 
+![plot of chunk unnamed-chunk-26](figure/unnamed-chunk-26-1.png) 
 
 *Note to self*: work through disease modeling example in chapter 6. 
 
