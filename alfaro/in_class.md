@@ -4,7 +4,7 @@ author: "Gaurav Kandlikar"
 output: html_document
 ---
 
-Date of last knit: Wed Sep 16 13:21:19 2015
+Date of last knit: Wed Sep 16 13:28:09 2015
 
 Tinkering around:
 
@@ -16,7 +16,7 @@ all.I.know.about.life.I.learned.in.grad.school()
 ```
 
 ```
-## Need...more...coffee....
+## Time to push back the frontiers of knowledge.
 ```
 
 ### Playing with phylo trees
@@ -123,12 +123,12 @@ head(dd[which(dd$mode == "MPF"), ])
 
 ```
 ##                   species mode      size
-## 34     Acanthurus_blochii  MPF 0.1995223
-## 35  Acanthurus_dussumieri  MPF 0.6929505
-## 36    Acanthurus_lineatus  MPF 0.9417429
-## 37 Acanthurus_nigrofuscus  MPF 0.7101713
-## 38   Acanthurus_olivaceus  MPF 0.3099688
-## 39  Acanthurus_triostegus  MPF 0.2151248
+## 34     Acanthurus_blochii  MPF 0.8910472
+## 35  Acanthurus_dussumieri  MPF 0.2858320
+## 36    Acanthurus_lineatus  MPF 0.4376255
+## 37 Acanthurus_nigrofuscus  MPF 0.6611830
+## 38   Acanthurus_olivaceus  MPF 0.6132658
+## 39  Acanthurus_triostegus  MPF 0.5276693
 ```
 
 
@@ -211,46 +211,3 @@ while (i < 10) {
 ## nobody cares about 9  :(
 ```
 
-### Exercise 1
-Write a for loop statements so that it runs from 1:9 and prints the following output to your screen:
-
-```r
-for(i in 1:9) {
-  if (i < 9) {
-    cat("\n")
-  } else {
-    cat("*")
-  }
-}
-```
-
-```
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## 
-## *
-```
-
-
-### Exercise 2
-Modify your for loop so that it prints 10 asterisks, with each asterisk separated by exactly one ampersand sign (&), with no spaces or new line characters.
-
-
-```r
-for(i in 1:9) {
-  if (i < 9) {
-    cat("*&")
-  } else {
-    cat("*&*")
-  }
-}
-```
-
-```
-## *&*&*&*&*&*&*&*&*&*
-```
