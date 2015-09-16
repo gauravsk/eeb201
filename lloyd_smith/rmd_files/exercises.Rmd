@@ -91,3 +91,12 @@ logistic_pop_growth <- function(N, rr, generations = 20, K) {
 logistic_pop_growth(N = 100, rr = 0.1, K = 1000)
 
 ```
+
+### Exercises 3.3.3
+
+Do a systematic exploration of parameter space
+
+```{r}
+rrs <- c(-0.3, 0.3, 1.3, 1.9, 2.2, 2.7)
+
+```
