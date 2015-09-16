@@ -1,0 +1,91 @@
+---
+title: "Script from Alfaro's section of R bootcamp"
+author: "Gaurav Kandlikar"
+output: html_document
+---
+
+Date of last knit: `r date()`
+
+Tinkering around:
+```{r}
+source("../source.example.R")
+
+# Run the function
+all.I.know.about.life.I.learned.in.grad.school()
+```
+
+### Playing with phylo trees
+```{r}
+library(ape)
+tt <- read.tree("../tree.tre")
+
+# explore what is in tt
+head(tt$tip.label); attributes(tt); str(tt)
+
+# import in a table with some data about tips
+dd <- read.table("../data.txt", as.is = T, sep = "\t", header = T)
+str(dd); head(dd) # Apparently there's NAs
+unique(dd$mode)
+
+# generate some random data and add it into a new col
+dd$size <- runif(n = nrow(dd))
+# if we just want it temporarily, just call cbind()
+
+# Using which() to select certain rows
+
+which(dd$mode == "MPF") # returns row numbers - which() just gives cells for which a value is TRUE
+
+# Make a vector of species with MPF
+head(dd$species[which(dd$mode == "MPF")])
+
+# Make a df with just the MPF swimmers
+head(dd[which(dd$mode == "MPF"), ])
+```
+
+```{r controls}
+# fun for loop
+notfish <- c("bat", "dolphin")
+for (animal in notfish){
+  cat(animal, "fish\n", sep = "") # default sep is " "
+}
+
+# while loop
+i <- 1
+while(i < 5) {
+  cat("The value of i right now is", i, "\n")
+   i <- i+1
+}
+
+# conditionally break a while loop
+i <- 1 
+while (i < 5) {
+  i <- i+1
+  
+  if (i == 3){
+    break
+  }
+  
+}
+i # should be three, because that's when the loop is stopped
+
+# if + else
+i <- 1
+while (i < 10) {
+#   if (i %% 2 == 0) {
+#     cat("The number", i, "is even\n")
+#   } else {
+#     cat("The number", i, "is odd\n")
+#   }
+  
+  if (i == 7) {
+    cat("    lucky number", i, "!\n")
+  } else {
+    cat("nobody cares about", i, " :(\n")
+  }
+  
+  i <- i+1
+}
+
+
+```
+
