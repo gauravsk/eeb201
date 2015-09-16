@@ -91,3 +91,46 @@ plot(x = 1:generations, y = pop_sizes, type = "l")
 ```
 
 ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+
+```r
+#####################################
+# Make this for multiple values of R
+
+# Define a function first
+pop_growth <- function(N, RR, generations = 20) {
+  pop_sizes <- numeric(generations)
+  pop_sizes[1] <- N_init
+  for (time in 2:generations){
+    pop_sizes[time] <- RR*pop_sizes[time-1]
+  }
+  return(pop_sizes)
+}
+
+RRs <- c(0.9, 1, 1.05, 1.1, 1.5)
+trajectories <- sapply(RRs, function(x) pop_growth(N = N_init, RR = x))
+
+
+# Make a function to plot this thing
+multi_plot <- function(m, log = T) {
+  if(log == T) {m <- log(m)}
+  range <- range(m)
+  colors <- rainbow(n = ncol(m))
+  
+  ylab_text <- "log(N)"
+  if (log == F) {ylab_text <- "N"}
+  plot(1, type = "n", xlim = c(0, nrow(trajectories)), ylim = c(range[1]-1, range[2]+2), 
+       main = "Effect of varying R", ylab = ylab_text, xlab = "Generation")
+  
+  sapply(1:ncol(m), function(x) lines(y = m[,x], x = 1:nrow(m), col = colors[x], lwd = 2))
+  legend("topleft", col = colors, legend = RRs, lwd = 1.25, bty = "n")
+}
+
+multi_plot(m = trajectories); multi_plot(m = trajectories, log = F)
+```
+
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-2.png) ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-3.png) 
+
+```r
+# Try this in ggplot2 at some point
+```
+
