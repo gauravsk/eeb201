@@ -1,0 +1,93 @@
+---
+title: "Lloyd Smith exercises"
+author: "Gaurav Kandlikar"
+date: "September 16, 2015"
+output: html_document
+---
+
+### Mini exercise 3.2.1
+
+Tweaking parameters of discrete growth model
+
+```{r}
+# conditions & parameters (these are new!)
+generations <- 200
+RR <- 1.001 # R is a parameter
+N_init <- 100 # N is a state variable
+
+# create and populate pop size vector
+pop_sizes <- numeric(generations)
+pop_sizes[1] <- N_init
+for (time in 2:generations){
+  pop_sizes[time] <- RR*pop_sizes[time-1]
+}
+
+pop_sizes
+
+# My favourite plot:
+plot(x = 1:generations, y = pop_sizes, type = "l", lwd = 2,
+     xlab = "generations", main = paste("R = ", RR))
+
+```
+
+### Exercise 3.2.2
+Convert the model to a function
+
+```{r}
+# The function
+geom_pop_growth <- function(N, RR, generations = 20) {
+  pop_sizes <- numeric(generations)
+  pop_sizes[1] <- N_init
+  for (time in 2:generations){
+    pop_sizes[time] <- RR*pop_sizes[time-1]
+  }
+  plot(y = pop_sizes, x = 1:generations, type = "l", lwd = 2)
+  return(pop_sizes)
+}
+
+# Run the function 
+geom_pop_growth(N = 100, RR = 1.1)
+```
+
+
+### Exercise 3.3
+Logistic growth (includes carrying capacity)
+
+```{r}
+# parameters
+# conditions & parameters (these are new!)
+generations <- 200
+rr <- .1 # R is a parameter
+N_init <- 100 # N is a state variable
+K <- 1000 # Carrying capacity - a parameter
+
+# create and populate pop size vector
+pop_sizes <- numeric(generations)
+pop_sizes[1] <- N_init
+for (time in 2:generations){
+  pop_sizes[time] <- pop_sizes[time-1]*(1+rr*(1-pop_sizes[time-1]/K))
+}
+plot(y = pop_sizes, x = 1:generations, type = "l", lwd = 2)
+
+```
+
+### 3.3.1
+Convert above logistic growth to a function
+
+```{r}
+# The function
+
+logistic_pop_growth <- function(N, rr, generations = 20, K) {
+  pop_sizes <- numeric(generations)
+  pop_sizes[1] <- N_init
+  for (time in 2:generations){
+    pop_sizes[time] <- pop_sizes[time-1]*(1+rr*(1-pop_sizes[time-1]/K))
+  }
+  plot(y = pop_sizes, x = 1:generations, type = "l", lwd = 2)
+  
+}
+
+# Run the function
+logistic_pop_growth(N = 100, rr = 0.1, K = 1000)
+
+```
