@@ -7,6 +7,8 @@ toc: yes
 
 ---
 
+Date of last knit: Wed Sep 16 10:00:11 2015
+
 ### Appendix B1
 This section focuses on using R's help functions.
 
