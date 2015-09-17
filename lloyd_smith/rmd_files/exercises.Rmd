@@ -11,8 +11,8 @@ Tweaking parameters of discrete growth model
 
 ```{r}
 # conditions & parameters (these are new!)
-generations <- 200
-RR <- 1.001 # R is a parameter
+generations <- 100
+RR <- -0.9 # R is a parameter
 N_init <- 100 # N is a state variable
 
 # create and populate pop size vector
@@ -22,7 +22,7 @@ for (time in 2:generations){
   pop_sizes[time] <- RR*pop_sizes[time-1]
 }
 
-pop_sizes
+head(pop_sizes)
 
 # My favourite plot:
 plot(x = 1:generations, y = pop_sizes, type = "l", lwd = 2,
@@ -79,24 +79,48 @@ Convert above logistic growth to a function
 
 logistic_pop_growth <- function(N, rr, generations = 20, K) {
   pop_sizes <- numeric(generations)
-  pop_sizes[1] <- N_init
+  pop_sizes[1] <- N
   for (time in 2:generations){
     pop_sizes[time] <- pop_sizes[time-1]*(1+rr*(1-pop_sizes[time-1]/K))
   }
-  plot(y = pop_sizes, x = 1:generations, type = "l", lwd = 2)
   
+  plot(y = pop_sizes, x = 1:generations, type = "l", lwd = 2)
+  return(pop_sizes)
 }
 
 # Run the function
-logistic_pop_growth(N = 100, rr = 0.1, K = 1000)
+logistic_pop_growth(N = 10, rr = 0.1, K = 100)
 
 ```
 
-### Exercises 3.3.3
+### Exercises 3.3.2
 
 Do a systematic exploration of parameter space
 
 ```{r}
 rrs <- c(-0.3, 0.3, 1.3, 1.9, 2.2, 2.7)
 
+par(mfrow = c(2,3))
+for(rr in rrs) {
+  logistic_pop_growth(N = 10, rr = rr, generations = 20, K = 100)
+}
+```
+
+
+### Exercise 3.3.3
+
+Bifurcation plot
+
+```{r}
+rrs <- seq(from = -1, to = 3, length.out = 100)
+generations <- 100
+trajectories <- sapply(rrs, function(x) logistic_pop_growth(N = 10, K = 100, rr = x, generations = generations))
+
+# I think this is what a bifurcation plot is!
+par(mfrow = c(1,1))
+matplot(y = trajectories[generations, ], x = rrs, type = "l", lwd = 2,
+        main = "Bifurcation plot?")
+
+# Or maybe it's this, but so messy!
+matplot(y = trajectories, x = rrs, type = "l", lwd = 0.5)
 ```

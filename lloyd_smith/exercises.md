@@ -12,8 +12,8 @@ Tweaking parameters of discrete growth model
 
 ```r
 # conditions & parameters (these are new!)
-generations <- 200
-RR <- 1.001 # R is a parameter
+generations <- 100
+RR <- -0.9 # R is a parameter
 N_init <- 100 # N is a state variable
 
 # create and populate pop size vector
@@ -23,39 +23,11 @@ for (time in 2:generations){
   pop_sizes[time] <- RR*pop_sizes[time-1]
 }
 
-pop_sizes
+head(pop_sizes)
 ```
 
 ```
-##   [1] 100.0000 100.1000 100.2001 100.3003 100.4006 100.5010 100.6015
-##   [8] 100.7021 100.8028 100.9036 101.0045 101.1055 101.2066 101.3078
-##  [15] 101.4091 101.5105 101.6121 101.7137 101.8154 101.9172 102.0191
-##  [22] 102.1211 102.2233 102.3255 102.4278 102.5302 102.6328 102.7354
-##  [29] 102.8381 102.9410 103.0439 103.1470 103.2501 103.3533 103.4567
-##  [36] 103.5602 103.6637 103.7674 103.8712 103.9750 104.0790 104.1831
-##  [43] 104.2873 104.3915 104.4959 104.6004 104.7050 104.8097 104.9145
-##  [50] 105.0195 105.1245 105.2296 105.3348 105.4402 105.5456 105.6512
-##  [57] 105.7568 105.8626 105.9684 106.0744 106.1805 106.2867 106.3929
-##  [64] 106.4993 106.6058 106.7124 106.8191 106.9260 107.0329 107.1399
-##  [71] 107.2471 107.3543 107.4617 107.5691 107.6767 107.7844 107.8922
-##  [78] 108.0001 108.1081 108.2162 108.3244 108.4327 108.5411 108.6497
-##  [85] 108.7583 108.8671 108.9759 109.0849 109.1940 109.3032 109.4125
-##  [92] 109.5219 109.6314 109.7411 109.8508 109.9607 110.0706 110.1807
-##  [99] 110.2909 110.4012 110.5116 110.6221 110.7327 110.8434 110.9543
-## [106] 111.0652 111.1763 111.2875 111.3988 111.5102 111.6217 111.7333
-## [113] 111.8450 111.9569 112.0688 112.1809 112.2931 112.4054 112.5178
-## [120] 112.6303 112.7429 112.8557 112.9685 113.0815 113.1946 113.3078
-## [127] 113.4211 113.5345 113.6480 113.7617 113.8754 113.9893 114.1033
-## [134] 114.2174 114.3316 114.4460 114.5604 114.6750 114.7896 114.9044
-## [141] 115.0193 115.1344 115.2495 115.3647 115.4801 115.5956 115.7112
-## [148] 115.8269 115.9427 116.0587 116.1747 116.2909 116.4072 116.5236
-## [155] 116.6401 116.7568 116.8735 116.9904 117.1074 117.2245 117.3417
-## [162] 117.4590 117.5765 117.6941 117.8118 117.9296 118.0475 118.1656
-## [169] 118.2837 118.4020 118.5204 118.6389 118.7576 118.8763 118.9952
-## [176] 119.1142 119.2333 119.3526 119.4719 119.5914 119.7110 119.8307
-## [183] 119.9505 120.0705 120.1905 120.3107 120.4310 120.5515 120.6720
-## [190] 120.7927 120.9135 121.0344 121.1554 121.2766 121.3979 121.5193
-## [197] 121.6408 121.7624 121.8842 122.0061
+## [1] 100.000 -90.000  81.000 -72.900  65.610 -59.049
 ```
 
 ```r
@@ -127,25 +99,69 @@ Convert above logistic growth to a function
 
 logistic_pop_growth <- function(N, rr, generations = 20, K) {
   pop_sizes <- numeric(generations)
-  pop_sizes[1] <- N_init
+  pop_sizes[1] <- N
   for (time in 2:generations){
     pop_sizes[time] <- pop_sizes[time-1]*(1+rr*(1-pop_sizes[time-1]/K))
   }
-  plot(y = pop_sizes, x = 1:generations, type = "l", lwd = 2)
   
+  plot(y = pop_sizes, x = 1:generations, type = "l", lwd = 2)
+  return(pop_sizes)
 }
 
 # Run the function
-logistic_pop_growth(N = 100, rr = 0.1, K = 1000)
+logistic_pop_growth(N = 10, rr = 0.1, K = 100)
 ```
 
 ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
 
-### Exercises 3.3.3
+```
+##  [1] 10.00000 10.90000 11.87119 12.91738 14.04226 15.24930 16.54169
+##  [8] 17.92224 19.39325 20.95648 22.61295 24.36290 26.20564 28.13947
+## [15] 30.16159 32.26803 34.45360 36.71191 39.03534 41.41512
+```
+
+### Exercises 3.3.2
 
 Do a systematic exploration of parameter space
 
 
 ```r
 rrs <- c(-0.3, 0.3, 1.3, 1.9, 2.2, 2.7)
+
+par(mfrow = c(2,3))
+for(rr in rrs) {
+  logistic_pop_growth(N = 10, rr = rr, generations = 20, K = 100)
+}
 ```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
+
+### Exercise 3.3.3
+
+Bifurcation plot
+
+
+```r
+rrs <- seq(from = -1, to = 3, length.out = 100)
+generations <- 100
+trajectories <- sapply(rrs, function(x) logistic_pop_growth(N = 10, K = 100, rr = x, generations = generations))
+```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-2.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-3.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-4.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-5.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-6.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-7.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-8.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-9.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-10.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-11.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-12.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-13.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-14.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-15.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-16.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-17.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-18.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-19.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-20.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-21.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-22.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-23.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-24.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-25.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-26.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-27.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-28.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-29.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-30.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-31.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-32.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-33.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-34.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-35.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-36.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-37.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-38.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-39.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-40.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-41.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-42.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-43.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-44.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-45.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-46.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-47.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-48.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-49.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-50.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-51.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-52.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-53.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-54.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-55.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-56.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-57.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-58.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-59.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-60.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-61.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-62.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-63.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-64.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-65.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-66.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-67.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-68.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-69.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-70.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-71.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-72.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-73.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-74.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-75.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-76.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-77.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-78.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-79.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-80.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-81.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-82.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-83.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-84.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-85.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-86.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-87.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-88.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-89.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-90.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-91.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-92.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-93.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-94.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-95.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-96.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-97.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-98.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-99.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-100.png) 
+
+```r
+# I think this is what a bifurcation plot is!
+par(mfrow = c(1,1))
+matplot(y = trajectories[generations, ], x = rrs, type = "l", lwd = 2,
+        main = "Bifurcation plot?")
+```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-101.png) 
+
+```r
+# Or maybe it's this, but so messy!
+matplot(y = trajectories, x = rrs, type = "l", lwd = 0.5)
+```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-102.png) 
