@@ -161,3 +161,152 @@ matplot(y = trajectories, x = rrs, type = "l", lwd = 0.5)
 ```
 
 ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-2.png) 
+
+### 4.1: Differential equations with `deSolve`
+
+The `lsoda` function in `deSolve` is a good numerical differential equation solver. 
+
+```r
+library(deSolve)
+
+# Set up the model
+expGrowthODE <- function(tt, NN, params) { # Note that this needs to be (time, init, params!)
+  derivs <- params["rr"]*NN # Exponential growth equation
+  return(list(derivs))  # Return the derivs 
+}
+
+# Use lsoda to run the ODE
+# lsoda(initial value of state variable, time seq, user-defined model, parameters)
+
+# Set initial and parameters
+init <- 1
+tseq <- seq(from = 1, to = 20, by = 0.01)
+parameters <- c(rr = 0.1)
+
+pop_growth <- lsoda(init, tseq, expGrowthODE, parameters)
+head(pop_growth)
+```
+
+```
+##      time        1
+## [1,] 1.00 1.000000
+## [2,] 1.01 1.001001
+## [3,] 1.02 1.002002
+## [4,] 1.03 1.003005
+## [5,] 1.04 1.004008
+## [6,] 1.05 1.005013
+```
+
+```r
+plot(x = pop_growth[, 1], y = pop_growth[, 2], type = "l", lwd = 2,
+     xlab = "time", ylab = "population size")
+```
+
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
+
+### Exercise 4.2.1
+Building the logistic growth model
+
+```r
+# Set up the model
+logGrowthODE <- function(tt, NN, params) { 
+  derivs <- params["rr"]*NN*(1-(NN/params["kk"]))
+  return(list(derivs))  # Return the derivs 
+}
+
+# Set initial and parameters
+init <- 10
+tseq <- seq(from = 1, to = 125, by = 0.01)
+parameters <- c(rr = 0.05, kk = 100)
+
+log_pop_growth <- lsoda(init, tseq, logGrowthODE, parameters)
+head(log_pop_growth)
+```
+
+```
+##      time        1
+## [1,] 1.00 10.00000
+## [2,] 1.01 10.00450
+## [3,] 1.02 10.00900
+## [4,] 1.03 10.01351
+## [5,] 1.04 10.01801
+## [6,] 1.05 10.02252
+```
+
+```r
+plot(x = log_pop_growth[, 1], y = log_pop_growth[, 2], type = "l", lwd = 2,
+     xlab = "time", ylab = "population size")
+```
+
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png) 
+
+```r
+# plot dN/dT vs time
+log_pop_growth <- data.frame(log_pop_growth)
+log_pop_growth[,3] <- rep(NA, nrow(log_pop_growth))
+# log_pop_growth[1, 3] <- 0
+# Get dN per dt
+differences <- diff(log_pop_growth[,2])
+log_pop_growth[2:nrow(log_pop_growth), 3] <- differences
+plot(x = log_pop_growth[, 1], y = log_pop_growth[, 3], type = "l", lwd = 2,
+     xlab = "time", ylab = "change in population size")
+```
+
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-2.png) 
+
+```r
+# Fix names of log_pop_growth to be a bit more readable
+colnames(log_pop_growth)
+```
+
+```
+## [1] "time" "X1"   "V3"
+```
+
+```r
+colnames(log_pop_growth) <- c("time", "pop_size", "growth"); colnames(log_pop_growth)
+```
+
+```
+## [1] "time"     "pop_size" "growth"
+```
+
+```r
+# make a stacked plot
+par(mfrow = c(2, 1))
+plot(x = log_pop_growth[, 1], y = log_pop_growth[, 2], type = "l", lwd = 2,
+     xlab = "time", ylab = "population size")
+plot(x = log_pop_growth[, 1], y = log_pop_growth[, 3], type = "l", lwd = 2,
+     xlab = "time", ylab = "change in population size")
+```
+
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-3.png) 
+
+```r
+# Find out where growth rate (dN/dT) peaks
+max_growth <- log_pop_growth[which(log_pop_growth[,3] == max(log_pop_growth[,3], na.rm = T)), ]
+max_growth
+```
+
+```
+##       time pop_size growth
+## 4396 44.95 50.00689 0.0125
+```
+
+```r
+# Make a single plot, maybe :o
+par(mfrow = c(1,1), mar = c(5,4,4,4)+0.3)
+plot(x = log_pop_growth[, 1], y = log_pop_growth[, 2], type = "l", lwd = 3,
+     xlab = "time", ylab = "population size", main = "Population with logistic growth")
+par(new = T)
+plot(x = log_pop_growth[, 1], y = log_pop_growth[, 3], type = "l", lwd = 3, xlab = "", ylab = "", axes = F, col = "darkgreen")
+axis(side = 4, at = pretty(range(log_pop_growth[, 3], na.rm = T)))
+mtext(side = 4, "growth rate", line = 3, col = "darkgreen")
+text(15, .012, "growth rate")
+text(80, .012, "population size")
+abline(v = max_growth[, 1], lwd = 2, lty = 2)
+mtext(side = 1, text = paste("Max growth rate occurs when N = ", floor(max_growth[,2]), sep = ""), line = 4)
+```
+
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-4.png) 
+
