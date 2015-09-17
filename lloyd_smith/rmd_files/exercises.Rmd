@@ -118,8 +118,7 @@ trajectories <- sapply(rrs, function(x) logistic_pop_growth(N = 10, K = 100, rr 
 
 # I think this is what a bifurcation plot is!
 par(mfrow = c(1,1))
-matplot(y = trajectories[generations, ], x = rrs, type = "l", lwd = 2,
-        main = "Bifurcation plot?")
+matplot(y = trajectories[generations, ], x = rrs, type = "l", lwd = 2, main = "Bifurcation plot?")
 
 # Or maybe it's this, but so messy!
 matplot(y = trajectories, x = rrs, type = "l", lwd = 0.5)
@@ -203,10 +202,33 @@ plot(x = log_pop_growth[, 1], y = log_pop_growth[, 2], type = "l", lwd = 3,
 par(new = T)
 plot(x = log_pop_growth[, 1], y = log_pop_growth[, 3], type = "l", lwd = 3, xlab = "", ylab = "", axes = F, col = "darkgreen")
 axis(side = 4, at = pretty(range(log_pop_growth[, 3], na.rm = T)))
-mtext(side = 4, "growth rate", line = 3, col = "darkgreen")
-text(15, .012, "growth rate")
+mtext(side = 4, "growth rate", line = 3)
+text(15, .012, "growth rate", col = "darkgreen")
 text(80, .012, "population size")
 abline(v = max_growth[, 1], lwd = 2, lty = 2)
 mtext(side = 1, text = paste("Max growth rate occurs when N = ", floor(max_growth[,2]), sep = ""), line = 4)
 ```
 
+Playing around a bit more with the logistic growth model:
+
+```{r}
+# Set initial and parameters
+init <- 10
+tseq <- seq(from = 1, to = 125, by = 0.01)
+
+# In exercise 3.3.2, we explored values of rr. 
+# Let's do that again, but with the continuous version
+# Recall that earlier, rrs <- c(-0.3, 0.3, 1.3, 1.9, 2.2, 2.7)
+# We can do this in a loop.
+
+rrs <- c(-0.3, 0.3, 1.3, 1.9, 2.2, 2.7) 
+par(mfrow = c(2,3))
+for (ii in rrs) {
+  parameters <- c(rr = ii, kk = 100)
+  log_pop_growth2 <- lsoda(init, tseq, logGrowthODE, parameters)
+  head(log_pop_growth2)
+  plot(y = log_pop_growth2[,2], x = log_pop_growth2[,1], type = "l", lwd = 3, xlab = "time", ylab = "population size", main = paste("r = ", ii))
+  }
+```
+
+Compare this to the figure in Exercise 3.3.2, where the population sizes bounced around at higher values of R. This may because converting it to continuous time may make the model respond immediately to being close to the carrying capacity as opposed to responding to some previous time step. **look this up!**
