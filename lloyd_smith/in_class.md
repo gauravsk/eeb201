@@ -131,6 +131,13 @@ multi_plot(m = trajectories); multi_plot(m = trajectories, log = F)
 ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-2.png) ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-3.png) 
 
 ```r
+# Easier to do this with matplot()
+matplot(y = log(trajectories), x = c(1:nrow(trajectories)), pch = 19, type = "l")
+```
+
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-4.png) 
+
+```r
 # Try this in ggplot2 at some point
 ```
 
