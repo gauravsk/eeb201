@@ -13,7 +13,7 @@ Tweaking parameters of discrete growth model
 ```r
 # conditions & parameters (these are new!)
 generations <- 100
-RR <- -0.9 # R is a parameter
+RR <- 0.9 # R is a parameter
 N_init <- 100 # N is a state variable
 
 # create and populate pop size vector
@@ -27,7 +27,7 @@ head(pop_sizes)
 ```
 
 ```
-## [1] 100.000 -90.000  81.000 -72.900  65.610 -59.049
+## [1] 100.000  90.000  81.000  72.900  65.610  59.049
 ```
 
 ```r
