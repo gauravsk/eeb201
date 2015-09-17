@@ -1,0 +1,504 @@
+---
+title: "Appendix B from Primer of Ecology w/ R"
+author: "Gaurav Kandlikar"
+date: "September 6, 2015"
+output: html_document
+toc: yes
+
+---
+
+Date of last knit: `r date()`
+
+### Appendix B1
+This section focuses on using R's help functions.
+```{r}
+set.seed(9123) # dont want to make new graphs each time
+### When you know a function name ----
+?mean
+
+# Equivalent:
+help(mean)
+?mean
+
+### When you don't know a function name ----
+help.search("mean") # Here, "mean" is just a keyword
+apropos("mean") # Here, functions with "mean" in the name are shown
+
+### When you want to search in packages that might not yet be on the system
+# RSiteSearch("violin") # This opens in the browser -- commented for now...
+```
+
+### Appendix B2
+
+This section works through assigning values to variables.
+```{r}
+a <- 2+3
+a
+
+# Use a as input to another variable
+b <- a+a
+
+# Use semicolon to make two calls on one line
+a+b; b+b
+```
+
+### Appendix B3
+
+#### Appendix B3.1
+Vectors 
+
+```{r}
+# Creating a vector Y with some known values
+Y <- c(8.3, 8.6, 10.7, 10.8, 11, 11, 11.1, 11.2,11.3, 11.4)
+
+# Creating sequences of numbers
+1:4; 4:1; -1:3; -(1:3) # minus sign outside acts as a function
+
+# Sequencing by non-integer increments
+seq(from = 1, to = 3, by = 0.2)
+
+seq(1, 3, by = 0.2) # We can skip argument names
+
+seq(1, 3, length = 7) # If we just know how long a vector we need
+
+# Repeating sequences
+rep(1, 3) # Repeat 1 three times
+rep(1:3, 2) # Repeat 1:3 three times
+rep(1:3, each = 2) # Repeat each number in 1:3 twice
+```
+
+
+#### Appendix B3.2
+Info about vectors
+```{r}
+# Recall Y:
+Y
+
+sum(Y); mean(Y); max(Y); length(Y); summary(Y)
+```
+
+Vectors aren't always numeric
+```{r}
+Names <- c("Sarah", "Yunluan")
+Names
+
+b <- c(TRUE, FALSE)
+
+# Find out what kind of a vector it is!
+class(Y); class(b)
+```
+
+Tests are vectorized:
+```{r}
+Y>10
+Y > mean(Y)
+Y == 11
+Y != 11
+
+# We can use this to extract the data:
+# Get all values of Y that are bigger than the mean of Y:
+Y[Y > mean(Y)]
+```
+
+Vector algebra
+```{r}
+a <- 1:3; b <- 4:6
+
+# Play with two vectors of equal lengths
+a + b
+a * b
+a/b
+
+# Play with a vector and a scalar
+a + 1
+a * 2
+1/a
+
+# Play with two vectors of unequal lengths
+a * 1:2 # Note the warning.... This is equivalent to `a * c(1, 2, 1)`
+
+1:4 * 1:2 # Note no warning here, even though it's 4 * 2.
+```
+
+#### Appendix B3.3
+Extracting data and handling missing values
+Two ways to extract data from vectors: 1) provide numeric index; 2) provide logical vector
+
+```{r}
+# Using numeric index
+Y[1]
+Y[1:3]
+
+# Using logical vector
+Y[Y > mean(Y)] # Recall that the inside is just a T/F vector
+```
+
+Missing data is SRS BSNS!
+```{r}
+a <- c(5, 3, 6, NA)
+a
+is.na(a)
+
+sum(a) # Throws an error since R doesn't know how to add NA
+
+# Multiple ways to eliminate the NAs from vectors (if that's the goal)
+a[!is.na(a)]
+na.exclude(a)
+
+# Some functions can remove NAs on the fly...
+mean(a) # Fail
+mean(a, na.rm = T) # Success
+``` 
+
+#### Appendix B.3.4
+Matrices! Two dimensions, all data are of the same type
+
+```{r}
+matrix(letters[1:4], ncol = 2)
+
+M <- matrix(1:4, nrow = 2); M # Notice that the numbers are filled in by column
+matrix(1:4, nrow = T, byrow = T) # To fill in by row
+
+# Making an identity matrix
+I <- diag(1, nrow = 2)
+
+# We can make inverse matrices of known matrices easily:
+
+M_inv <- solve(M)
+M %*% M_inv 
+```
+
+Extracting data from matrices is the same... matrix[row, column]
+```{r}
+M [1, 2] # First row; second col
+M [1, ]; M[1, 1:2] # Both are equivalent because there's just two columns anyway
+```
+
+
+### Appendix B3.4
+Matrix algebra
+
+Recall the difference between scalar and matrix operations...
+
+Given two matrices *A* and *B*, we can do element-wise (i.e. scalar) multiplication:
+![](matrix/element_wise_multi.png)
+or we can do matrix multiplication:
+![](matrix/matrix_multi.png)
+```{r}
+M <- matrix(1:4, nrow = 2)
+N <- matrix(0:3, nrow = 2)
+
+M*N
+
+# Matrix multiplication
+M %*% N; N %*% M # Non-commutative operation
+
+# We can multiply by other dimensional vectors (as long as one dimension matches)
+M %*% c(1,2); c(1,2) %*% M
+
+# But this won't work:
+M %*% c(1,2,3)
+
+# Matrix addition
+M + N; M + 2
+
+# Transpose
+t(M) # So don't use `t` as a variable name!
+```
+------------------------------------
+**The rest of this is not part of the assignment, just did it to work through the latter sections like ODEs and Optimizations**
+
+#### Appendix B3.5
+Data frames: two dimensionsal, like matrices, but can store multiple types of data, unlike matrices...
+
+```{r}
+dat <- data.frame(species = c("S.altissima", "S.rugosa", "E.graminifolia", "A. pilosus"), 
+                  treatment = factor(c("Control","Water", "Control", "Water")),
+                  height = c(1.1,0.8, 0.9, 1), 
+                  width = c(1, 1.7, 0.6, 0.2))
+dat
+
+# Extracting data 
+dat[2, ]
+dat[, 2]
+dat[3, 4]
+
+# We can treat these as vectors...
+dat[, 2] == "Water"
+# Use this to subset dat to only water
+dat[dat[,2] == "Water", ] # Or just use the subset()
+
+# Data frames often have factors.
+c("Control", "Medium", "High")
+rep(c("Control", "Medium", "High"), each = 3)
+
+Treatment <- factor(rep(c("Control", "Medium", "High"), each = 3))
+Treatment
+
+# The levels are stored alphabetically (i.e 1 will be control):
+levels(Treatment)
+stripchart(1:9 ~ Treatment)
+
+# We can force levels to be different:
+Treatment <- factor(rep(c("Control", "Medium", "High"), each = 3), 
+                    levels = c("Control", "Medium", "High"))
+stripchart(1:9 ~ Treatment)
+```
+
+#### Appendix B3.6
+Lists are just globs of objects...
+
+```{r}
+my.list <- list(My.Y = Y, b = b, 
+                Names, 
+                Weed.data = dat,
+                My.matrix = M, 
+                my.no = 4)
+my.list
+
+# Multiple ways of getting objects out of lists:
+my.list[["b"]]; my.list[[2]]; my.list$b
+# We can extract specific components from the objects
+my.list[["b"]][1]
+
+# We can think of data frames as a list of vectors;
+# This is what allows us to use the $ operator to extract data from dfs!
+```
+
+
+### Appendix B5
+Sorting
+```{r}
+e <- c(5,4,2,3,1)
+sort(e); sort(e, decreasing = T)
+
+# If we want to sort all the rows of a data frame, keeping records (rows) intact, we can use order. This function is a little tricky, so we explore its use in a vector.
+e; order(e); e[order(e)] # Order is generating the index to give us the sorted vector
+
+# This becomes a little clearer with a df 
+
+dat
+order(dat$height)
+dat[order(dat$height), ] # The width is in order!
+dat[rev(order(dat$height)), ] # The width is reversed!
+```
+
+### Appendix B6
+Skipping for now. 
+
+### Appendix B7
+#### Appendix B7.1
+Read through [Hadley's Tidy Data paper](http://www.jstatsoft.org/v59/i10/paper)
+```{r}
+summary(CO2)
+head(CO2)
+```
+
+We want to convert these such that the `conc` factor is just split into new columns
+
+```{r}
+CO2.wide <- reshape(CO2, v.names = "uptake", idvar = "Plant", timevar = "conc", direction = "wide")
+names(CO2.wide)
+
+# To go back to long format:
+CO2.long <- reshape(CO2.wide, v.names = "Uptake", 
+                    varying = list(4:10), timevar = "Concentration", 
+                    times = c(95, 175, 250, 350, 500, 675, 1000))
+```
+
+#### Appendix B7.2
+Summarising by groups
+
+```{r}
+# First argument is the column to be summarised; second is column identifying group belonging; third is the function
+tapply(CO2[[,"uptake"]], list(CO2[["Treatment"]]), mean)
+
+# Summarizing by treatment AND type
+tapply(CO2[["uptake"]], list(CO2[["Treatment"]], CO2[["Type"]]), sd)
+
+# `aggregate` allows us to summarize multiple columns at once: 
+aggregate(CO2[, 4:5], list(Plant = CO2[["Plant"]]), mean)
+```
+
+*Note to self*: Redo this using `reshape2` at some point. 
+
+### Appendix B8
+Reading into and Writing out from R
+
+```{r eval=FALSE}
+dat <- data.frame(Name = rep(c("Control", "Treatment"),
+                             each = 5), First = runif(10), Second = rnorm(1))
+
+# Spitting out dfs to the current wd
+write.table(dat, file = "dat.txt")
+write.csv(dat, file = "dat.csv")
+
+# Reading it back in
+dat.new <- read.csv("dat.csv")
+dat.new2 <- read.table("dat.txt", header = TRUE)
+
+# Spitting out some analyses:
+mod.out <- summary(aov(First ~ Name, data = dat))
+mod.out[[1]]
+write.csv(mod.out[[1]], "ModelANOVA.csv")
+```
+
+### Apppendix B9
+Probability distributions and Randomization
+
+There are many probability functions in r: `rnorm`, `dnorm`, `pnorm`, `qnorm`,...
+
+```{r}
+qnorm(p = c(0.025, 0.975))
+myplot <- hist(rnorm(20, m = 11, sd = 6), probability = TRUE)
+myplot
+lines(myplot$mids, dnorm(myplot$mids, m = 11, sd = 6)) # This is the pdf
+```
+
+### Appendix B10
+Numerical integration of ODEs using `desolve`
+
+```{r}
+library(deSolve)
+logGrowth <- function(t, y, p) {
+  N <- y[1]
+  with(as.list(p), {
+    dN.dt <- r * N * (1 - a * N) 
+    return(list(dN.dt))
+  })
+}
+
+p <- c(r = 1, a = 0.001) # The parameters
+y0 <- c(N = 10) # Init N
+t <- 1:20 # Number of time steps
+
+out <- ode(y = y0, times = t, func = logGrowth, parms = p)
+head(out)
+```
+
+Modeling two species competition
+```{r}
+LVComp <- function(t, y, p) {
+  N <- y
+
+  with(as.list(p), {
+    dN1.dt <- r[1] * N[1] * (1 - a[1, 1] * N[1] - a[1, 2] * N[2])
+    dN2.dt <- r[2] * N[2] * (1 - a[2, 1] * N[1] - a[2, 2] * N[2])
+    
+    return(list(c(dN1.dt, dN2.dt)))
+  })
+}
+
+# Specify start conditions in the format required by the function
+
+a <- matrix(c(0.02, 0.01, 0.01, 0.03), nrow = 2)
+r <- c(1, 1)
+p2 <- list(r, a)
+N0 <- c(10, 10)
+
+t2 <- c(1, 5, 10, 20)
+out <- ode(y = N0, times = t2, func = LVComp, parms = p2)
+out[1:4, ]
+```
+*Note to self*: Keep in mind `hmax` which can make the function take a big step
+`lsodar` returns roots to ODEs if they exist:
+
+```{r}
+EV <- function(t, y, p) {
+  
+  with(as.list(p), {
+    dv.dt <- b * y[1] * (1 - 0.005 * y[1]) 
+    a * y[1] * y[2]
+    de.dt <- a * e * y[1] * y[2] - s * y[2]
+    return(list(c(dv.dt, de.dt)))
+  })
+}
+
+# The rootfun checks whether the difference between the last few entries is less than some small number - here, 1e-10
+rootfun <- function(t, y, p) {
+  dstate <- unlist(EV(t, y, p))
+  return(sum(abs(dstate)) - 1e-10)
+}
+
+# Set the function inputs
+p <- c(b = 0.5, a = 0.02, e = 0.1, s = 0.2)
+t <- c(0, 1e+10) # The time is set to a large number so the rootfun has all the time it needs to find an equilibrium
+
+# Run function
+out <- ode(y = c(45, 200), t, EV, parms = p, rootfun = rootfun, method = "lsodar")
+out
+```
+
+### Appendix B11
+Numerical optimization
+
+We need to perform numerical optimization when we think that a model might describe a system, but we don't know the parameters values for the model. 
+ 
+From the text:  
+Once you have a model of the reality you want to describe, the basic steps
+toward optimization we consider are (i) create an *objective function*, (ii) use
+a routine to *minimize (or maximize) the objective function through optimal
+choice of parameter values*, and (iii) see if the “optimal” parameters values make
+sense, and perhaps refine and interpret them.
+
+An objective function compares the data to the predicted values from the
+model, and returns a quantitative measure of their difference. (e.g. Least Squares, ML). 
+
+In Maximum Liklihood, we use a pdf and try to tweak its parameters and calculate the probability of observing some data. "In other words, we pretend that the model and the predicted values are true, measure how far off each datum is from the predicted value, and then use a probability distribution to calculate the probability of seeing each datum." [...] "An optimization routine then tries to find model parameters that maximize this likelihood."
+
+`R`'s functions `optimize`, `optim` and `bbmle::mle2` are the ones explored here- the first used when we are estimating just a single parameter. 
+
+```{r}
+# In this scenario, we have a vector y and are estimating the mean
+
+y <- c(1, 0:10)
+
+# Define an optimization function -- here, the square differences between datum and mean are computed
+f <- function(y, mu) {
+  sum((y-mu)^2)
+}
+
+# If we guess a value for mu...
+guesses <- seq(from = 4, to = 6, by = 0.05)
+
+squared_diffs <- sapply(guesses, function(i) f(y, i))
+
+plot(squared_diffs~guesses, type = "l")
+```
+
+This procedure can be achieved with `optimize` in `R`.
+
+```{r}
+optimize(f = f, interval = c(0, 10), y = y)
+```
+
+Optimizing using maximum likelihood is similar, but we minimize the negative logarithm of the likelihood. Note that we use the normal pdf here because we assume that the data themselves are normally distributed
+
+```{r}
+LL <- function(mu, SD) {
+  -sum(dnorm(y, mean = mu, sd = SD, log = T))
+}
+
+# We use the optimization routine mle2 in bbmle:
+
+library(bbmle)
+# Equivalent calls:
+# fit <- mle2(y ~ dnorm(mu, sd = SD), start = list(mu = 5, SD = 1)))
+fit <- mle2(LL, start = list(mu = 5, SD = 1), control = list(maxit = 10^5))
+summary(fit)
+
+pr <- profile(fit)
+plot(pr)
+```
+
+*Note to self*: work through disease modeling example in chapter 6. 
+
+### Appendix B12
+Derivatives in R
+
+```{r}
+host1 <- expression(R * H * (1 + a * P)^-k)
+# derive with respect to H
+D(host1, "H")
+
+```
