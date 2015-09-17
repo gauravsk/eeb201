@@ -5,11 +5,14 @@ date: "September 17, 2015"
 output: html_document
 ---
 
+Plotting and genetic variation analysis exercises.
+Last generated on Thu Sep 17 15:17:51 2015. 
 
 ```r
 snp_data <- read.table("../hapmap_CEU_r23a_chr2_ld-1.txt")
 snp_data <- as.matrix(snp_data)
-# function for chisq
+
+# function for chisq 
 compute_chisquare=function(x){
 	freq=sum(x,na.rm=TRUE)/(2.0*sum(!is.na(x)))
 	cnt0=sum(x==0,na.rm=TRUE)
@@ -25,9 +28,28 @@ compute_chisquare=function(x){
 
 
 # Part A
-chisqs <- apply(snp_data,1,compute_chisquare)
-pvals <- pchisq(chisqs,1,lower.tail=FALSE)
+chisqs <- apply(snp_data,1,compute_chisquare); head(chisqs)
+```
 
+```
+##   rs300761_G  rs4854302_C  rs6717613_A  rs4643574_A  rs2709557_A 
+##   0.74074074   0.35164030   0.63031261   0.32921811   0.30612245 
+## rs11686764_G 
+##   0.01002484
+```
+
+```r
+pvals <- pchisq(chisqs,1,lower.tail=FALSE); head(pvals)
+```
+
+```
+##   rs300761_G  rs4854302_C  rs6717613_A  rs4643574_A  rs2709557_A 
+##    0.3894237    0.5531861    0.4272407    0.5661199    0.5800694 
+## rs11686764_G 
+##    0.9202458
+```
+
+```r
 # Part B
 for (ii in c(0.001, 0.01, 0.05, 0.25)) {
   print(mean(pvals < ii))
@@ -52,11 +74,27 @@ num_pvals <- length(pvals); num_pvals
 
 ```r
 # Part D
-expected_pvals <- (1:num_pvals)/num_pvals
+expected_pvals <- (1:num_pvals)/num_pvals; head(expected_pvals)
+```
 
+```
+## [1] 0.0002491281 0.0004982561 0.0007473842 0.0009965122 0.0012456403
+## [6] 0.0014947683
+```
+
+```r
 # Part E
-pvals <- sort(pvals)
+pvals <- sort(pvals); head(pvals)
+```
 
+```
+## rs13432713_T rs10179852_A rs12712519_G  rs1108190_G  rs1862098_T 
+## 1.582130e-05 9.466129e-05 6.597265e-04 8.659390e-04 9.991493e-04 
+##  rs1364646_A 
+## 1.048645e-03
+```
+
+```r
 # Part F
 log_sort_pvals <- -(log10(pvals))
 log_exp_pvals <- -(log10(expected_pvals))
@@ -202,3 +240,5 @@ table(control_genotypes) # One of them is NA - should be total of 15...
 ##  0 
 ## 14
 ```
+
+The intuition here might be that all of the "control" individuals are homozygous for the dominant allele; all of the "case" individuals have at least one copy of the rare allele. 

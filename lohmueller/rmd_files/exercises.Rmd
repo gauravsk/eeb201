@@ -5,10 +5,13 @@ date: "September 17, 2015"
 output: html_document
 ---
 
+Plotting and genetic variation analysis exercises.
+Last generated on `r date()`. 
 ```{r}
 snp_data <- read.table("../hapmap_CEU_r23a_chr2_ld-1.txt")
 snp_data <- as.matrix(snp_data)
-# function for chisq
+
+# function for chisq 
 compute_chisquare=function(x){
 	freq=sum(x,na.rm=TRUE)/(2.0*sum(!is.na(x)))
 	cnt0=sum(x==0,na.rm=TRUE)
@@ -24,8 +27,8 @@ compute_chisquare=function(x){
 
 
 # Part A
-chisqs <- apply(snp_data,1,compute_chisquare)
-pvals <- pchisq(chisqs,1,lower.tail=FALSE)
+chisqs <- apply(snp_data,1,compute_chisquare); head(chisqs)
+pvals <- pchisq(chisqs,1,lower.tail=FALSE); head(pvals)
 
 # Part B
 for (ii in c(0.001, 0.01, 0.05, 0.25)) {
@@ -36,10 +39,10 @@ for (ii in c(0.001, 0.01, 0.05, 0.25)) {
 num_pvals <- length(pvals); num_pvals
 
 # Part D
-expected_pvals <- (1:num_pvals)/num_pvals
+expected_pvals <- (1:num_pvals)/num_pvals; head(expected_pvals)
 
 # Part E
-pvals <- sort(pvals)
+pvals <- sort(pvals); head(pvals)
 
 # Part F
 log_sort_pvals <- -(log10(pvals))
@@ -91,3 +94,5 @@ table(case_genotypes)
 
 table(control_genotypes) # One of them is NA - should be total of 15...
 ```
+
+The intuition here might be that all of the "control" individuals are homozygous for the dominant allele; all of the "case" individuals have at least one copy of the rare allele. 
