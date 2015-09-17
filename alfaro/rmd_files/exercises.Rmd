@@ -31,3 +31,180 @@ for(i in 1:9) {
 }
 
 ```
+
+### Exercise 3
+By hand, figure out the initial values of these variables and values at the the start and end of each iteration of the loop
+
+```{r}
+dogs <- 10;
+for (i in 1:5){
+    dogs <- dogs + 1; 
+}
+
+# Initial value of dogs is 10
+# final value will be 15 (10 + 1 = 11 + 1 = 12 + 1 = 13 + 1 = 14 + 1 = 15)
+
+dogs
+```
+
+```{r}
+meatloaf <- 0; 
+for (i in 5:9){
+    meatloaf <- meatloaf - i + 1;
+    # cat(meatloaf) 
+}
+
+# initial value of meatloaf is 0
+# final value is 0-5+1 = -4; -4-6+1 = -9; -9-7+1 = -15; -15-8+1 = -22; -22-9+1 = -30
+
+meatloaf
+```
+
+```{r}
+bubbles <- 12;
+for (i in -1:-4){
+    bubbles <- i;
+}
+
+# initial value of bubbles is 12;
+# bubbles is then set to -1,then -2, ... -4
+bubbles
+```
+
+### Exercise 4
+Modify this code so that it will print out a message during presidential as well as congressional election years
+
+```{r}
+years <- c( 2015, 2016, 2018, 2020, 2021)
+for(ii in 1:length(years)){
+  if(years[ii] %% 2 == 0){
+    cat(years[ii], 'Hooray, congressional elections!', sep = '\t', fill = T)
+  } 
+  if(years[ii] %% 4 == 0) {
+    cat(years[ii], 'Hooray, presidential elections!', sep = '\t', fill = T)
+  }
+}
+```
+
+### Exercise 5 
+More fun with loops. Here are the bank accounts from seven randomly selected UCLA grad students
+
+Look at the error message the following lines of code produce. Can you think of a way to modify this loop so that the loop will compund the interest?
+
+```{r}
+bankAccounts <- c(10, 9.2, 5.6, 3.7, 8.8, 0.5);
+
+
+interestRate <- 0.0125
+for (i in 1:length(bankAccounts)) {
+    compounded[i] <- interestRate*bankAccounts[i] + bankAccounts[i]; }
+
+# we need to initialize `compounded`
+
+compounded <- rep(NA, length(bankAccounts))
+for (i in 1:length(bankAccounts)) {
+    compounded[i] <- interestRate*bankAccounts[i] + bankAccounts[i]; }
+```
+
+### Exercise 6
+
+Go back to the compounded interest example. Suppose we now want to compound the interest annually, but across a period of 5 years. The for loop we discussed earlier only compounds for a single year. Try this:
+
+```{r}
+bankAccounts <- c(10, 9.2, 5.6); #define bank accounts here
+interestRate <- 0.0525;   
+house <- c(4.8, 3.8, 5.7); #deduct
+food<- c(3.5, 4.3, 5.0);    #deduct
+fun <- c(7.8, 2.1, 10.5);  #deduct
+# and incomes (through TAships)
+income <- c(21, 21, 21); #add this
+
+for (j in 1:5) {
+    for (i in 1:length(bankAccounts)) {
+      #step 1 modify bankAccounts so that amounts reflect income and expenses
+      bankAccounts[i] <- bankAccounts[i]-house[i]-food[i]-fun[i]+income[i]
+      #step 2 get calculate interest and add to accounts from step 1
+      bankAccounts[i] <- interestRate*bankAccounts[i] + bankAccounts[i];
+      #you can actually use the line you have already written if you
+      #modify amounts in bankAccounts directly in step 1
+    }
+}
+
+bankAccounts
+```
+
+
+### Exercise 7
+Three students have estimated annual expenditures for food, housing, and fun of: (in thousands of dollars)
+```{r}
+bankAccounts <- c(10, 9.2, 5.6) # define bank accounts here
+interestRate <- 0.0525   
+house <- c(4.8, 3.8, 5.7) # deduct
+food <-  c(3.5, 4.3, 5.0) # deduct
+fun <-  c(7.8, 2.1, 10.5) # deduct
+
+# and incomes (through TAships) of 
+
+income <- c(21, 21, 21);
+
+
+for (j in 2015:2020) {
+    for (i in 1:length(bankAccounts)) {
+      # Update account with deductions and income
+      bankAccounts[i] <- bankAccounts[i]-house[i]-food[i]-fun[i]+income[i]
+      
+      # Update with fellowship money if available
+      if (j %% 2 == 1) { # Odd numbers
+        if (i == 1 | i == 3) { # For students 1 and 3
+          bankAccounts[i] <- bankAccounts[i] + 5
+        }
+      }
+      
+      bankAccounts[i] <- interestRate*bankAccounts[i] + bankAccounts[i]
+      # you can actually use the line you have already written if you
+      # modify amounts in bankAccounts directly in step 1
+    }
+}
+bankAccounts
+```
+
+
+### Exercise 8
+Use a while loop to sum all numbers from 1:17. You will need to use a counter variable (like index seen in class).
+
+```{r}
+counter <- 1
+total = 0
+
+while (counter < 18) {
+  total <- total + counter
+  counter <- counter + 1
+}
+
+# Make sure it's right!
+total == sum(1:17)
+```
+
+### Exercise 9
+Write a function takes a number, and prints ‘small’ if number less than or equal to -1; ‘medium’ if between -1 and + 1’big’ if greater than or equal to + 1
+
+```{r}
+size <- function(number) {
+  if (number <= -1) {
+    print("small")
+  } else if (number > -1 & number < 1) {
+    print("medium")
+  } else {
+    print("big")
+  }
+}
+
+# Try to test this using apply
+numbers <- seq(from = -1.2, to = 1.2, by = 0.6)
+sapply(numbers, size) # Not sure why this guy returns an extra vector :(
+
+# using a for loop...
+for (ii in numbers){
+  size(ii)
+}
+```
