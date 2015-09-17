@@ -26,3 +26,11 @@ legend("topleft", col = cols, pch = 19,
        legend = c(expression(paste(sigma, "= 1")), expression(paste(sigma, "= 3"))), bty = "n")
 
 ```
+
+
+### A cool trick
+```{r}
+mean(s1 > 3)
+
+mean(c(T, F, F, F))
+```

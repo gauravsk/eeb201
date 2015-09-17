@@ -1,0 +1,93 @@
+---
+title: "Lohmueller exercises"
+author: "Gaurav Kandlikar"
+date: "September 17, 2015"
+output: html_document
+---
+
+```{r}
+snp_data <- read.table("hapmap_CEU_r23a_chr2_ld-1.txt")
+snp_data <- as.matrix(snp_data)
+# function for chisq
+compute_chisquare=function(x){
+	freq=sum(x,na.rm=TRUE)/(2.0*sum(!is.na(x)))
+	cnt0=sum(x==0,na.rm=TRUE)
+	cnt1=sum(x==1,na.rm=TRUE)
+	cnt2=sum(x==2,na.rm=TRUE)
+	obscnts=c(cnt0,cnt1,cnt2)
+	#print(obscnts)
+	n=sum(obscnts)
+	expcnts=c((1-freq)^2,2*freq*(1-freq),freq^2)*n
+	chisq=sum((obscnts-expcnts)^2/expcnts)
+	return(chisq)
+}
+
+
+# Part A
+chisqs <- apply(snp_data,1,compute_chisquare)
+pvals <- pchisq(chisqs,1,lower.tail=FALSE)
+
+# Part B
+for (ii in c(0.001, 0.01, 0.05, 0.25)) {
+  print(mean(pvals < ii))
+}
+
+# Part C
+num_pvals <- length(pvals); num_pvals
+
+# Part D
+expected_pvals <- (1:num_pvals)/num_pvals
+
+# Part E
+pvals <- sort(pvals)
+
+# Part F
+log_sort_pvals <- -(log10(pvals))
+log_exp_pvals <- -(log10(expected_pvals))
+
+# Part G
+plot(y = log_sort_pvals, x = log_exp_pvals, pch = 19)
+
+# Part H
+plot(y = log_sort_pvals, x = log_exp_pvals, pch = 19, 
+     ylab = expression(paste(log[10], "(observed P)")),
+     xlab = expression(paste(log[10], "(expected P)")),
+     main = "QQ plot for chisq test")
+abline(a = 0, b = 1, lty = 2, col = "red", lwd = 4)
+```
+
+
+### Problem 2
+
+```{r}
+# Part A
+zz <- read.table("pheno.sim.2014-1.txt", header = T) 
+head(zz)
+
+# Take a look at blood glucose distributions
+plot(density(zz[,2]), lwd = 2)
+
+# Part B
+low_cutoff <- quantile(zz[, 2], 0.25); low_cutoff
+controls <- which(zz[, 2] < low_cutoff); controls
+length(controls) == 0.25*nrow(zz) # Verify
+
+
+# Part C
+high_cutoff <- quantile(zz[, 2], 0.75); high_cutoff
+cases <- which(zz[, 2] > high_cutoff); cases
+length(cases) == 0.25*nrow(zz) # Verify
+
+# Part D
+plot(density(zz[,2]), lwd = 3, main = "Distribution of blood glucose")
+abline(v = c(low_cutoff, high_cutoff), lwd = 2, lty = 2)
+
+# Parts E and F
+case_genotypes <- snp_data["rs7584086_T", cases]; length(case_genotypes)
+control_genotypes <- snp_data["rs7584086_T", controls]; length(control_genotypes)
+
+# Parts G and H
+table(case_genotypes) 
+
+table(control_genotypes) # One of them is NA - should be total of 15...
+```

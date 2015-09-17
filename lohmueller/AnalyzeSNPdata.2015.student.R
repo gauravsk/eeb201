@@ -12,10 +12,10 @@
 
 # Set working directory:
 #change this to whatever you want
-setwd("~/Dropbox/Kirk_stuff/KEL_bootcamp/2014")
+
 
 # Load a data set
-snpsDataFrame=read.table('hapmap_CEU_r23a_chr2_ld.txt',header=TRUE)
+snpsDataFrame=read.table('hapmap_CEU_r23a_chr2_ld-1.txt',header=TRUE)
 
 # What are the dimensions of the data?
 dim(snpsDataFrame)
@@ -32,7 +32,7 @@ head(snpsDataFrame)
 names(snpsDataFrame)
 
 # What are the row names? 
-row.names(snpsDataFrame)
+rownames(snpsDataFrame)
 
 # Because the data are really just a large numeric matrix, we convert the dataframe to a matrix:
 snps=as.matrix(snpsDataFrame)
@@ -42,24 +42,26 @@ snps=as.matrix(snpsDataFrame)
 # With row names we can easily extract certain SNPs using the id's
 testSNP=snps["rs218206_G",]
 
-table(testSNP)
+table(testSNP) # useful!
 
 # What is proportion of heterozygotes at this locus?
 het=sum(testSNP==1)/length(testSNP)
+# Equivalent:
+het == mean(testSNP == 1)
 
 # What if there is missing data?
 testSNP=snps["rs6717613_A",]
 
 # Try these commands
-table(testSNP)
-testSNP==1
-length(testSNP)
+table(testSNP) # Note that this doesn't add up to all 60 genotypes
+testSNP==1 # Note the NAs
+length(testSNP) # Length counts the missing data
 is.na(testSNP)
 
 # Now let's compute the observed heterozygosity
-het=sum(testSNP==1)/length(testSNP)  # Note how this fails
-het=sum(testSNP==1,na.rm=TRUE)/sum(!is.na(testSNP))  # but this doesn't 
-
+het=sum(testSNP==1)/length(testSNP); het  # Note how this fails
+het=sum(testSNP==1,na.rm=TRUE)/sum(!is.na(testSNP)); het  # but this doesn't 
+het == mean(testSNP == 1, na.rm = T) # Equivalent
 
 ###### EXPLORATORY PLOT OF SNP ALLELE FREQUENCY VS. OBSERVED HETEROZYGOSITY #####
 
@@ -67,7 +69,7 @@ het=sum(testSNP==1,na.rm=TRUE)/sum(!is.na(testSNP))  # but this doesn't
 # to the observed heterozygosity (i.e. the proportion of individuals who are heterozygotes)
 
 # What is the frequency of the minor allele?
-freq=sum(testSNP,na.rm=TRUE)/(2.0*sum(!is.na(testSNP)))
+freq=sum(testSNP,na.rm=TRUE)/(2.0*sum(!is.na(testSNP))) # makes sense bc the number in this equals number of minor alleles carried; bottom is equal to the number of alleles determined for the snp. 
 
 # Now, let's define functions that do this for a generic set of SNP data
 calc_freq=function(x){
@@ -79,11 +81,11 @@ calc_het=function(x){
 }
 
 # And now let's apply the functions to each and every SNP
-freq=apply(snps,1,calc_freq)
+freq=apply(snps,1,calc_freq) # 1 for row (per SNP)
 het=apply(snps,1,calc_het)
 
 # And now we can make exploratory plots
-plot(freq,het,xlab="Frequency",ylab="Heterozygosity")  # Scatter plot
+plot(x = freq, y = het,xlab="Frequency",ylab="Heterozygosity")  # Scatter plot
 
 # Let's add a line to show what relationship we'd expect under Hardy-Weinberg expectations
 p=seq(0,0.5,by=0.05)   # Set-up a vector with a sequence of allele frequencies
@@ -136,18 +138,19 @@ cor.test(chisqs,chisqs2)
 plot(chisqs,chisqs2)
 
 # Compute p-values for each chi-square value using the pchisq function
-pvals=pchisq(chisqs,1,lower.tail=FALSE)
+pvals=pchisq(chisqs,1,lower.tail=FALSE) # Convert chi sq statistic to a p-value
 
 
 
 # Count the number of pvals smaller than the significance threshold
 signifthres<-0.05
 sum(pvals<signifthres) 
-mean(pvals<signifthres) 
+mean(pvals<signifthres) # Not huge deviations from HW
 
 #which SNPs?
-sig_snps<-subset(pvals,pvals<0.05) #pull out the snps with P-vals<0.05
-sig_snp_ids<-names(sig_snps)
+sig_snps <- subset(pvals,pvals<0.05) #pull out the snps with P-vals<0.05
+sig_snp_ids <- names(sig_snps)
+
 
 
 #now pull out the genotypes for all teh significant SNPs:
