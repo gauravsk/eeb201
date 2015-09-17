@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r}
-snp_data <- read.table("hapmap_CEU_r23a_chr2_ld-1.txt")
+snp_data <- read.table("../hapmap_CEU_r23a_chr2_ld-1.txt")
 snp_data <- as.matrix(snp_data)
 # function for chisq
 compute_chisquare=function(x){
@@ -61,7 +61,7 @@ abline(a = 0, b = 1, lty = 2, col = "red", lwd = 4)
 
 ```{r}
 # Part A
-zz <- read.table("pheno.sim.2014-1.txt", header = T) 
+zz <- read.table("../pheno.sim.2014-1.txt", header = T) 
 head(zz)
 
 # Take a look at blood glucose distributions

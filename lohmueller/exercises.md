@@ -7,19 +7,7 @@ output: html_document
 
 
 ```r
-snp_data <- read.table("hapmap_CEU_r23a_chr2_ld-1.txt")
-```
-
-```
-## Warning in file(file, "rt"): cannot open file
-## 'hapmap_CEU_r23a_chr2_ld-1.txt': No such file or directory
-```
-
-```
-## Error in file(file, "rt"): cannot open the connection
-```
-
-```r
+snp_data <- read.table("../hapmap_CEU_r23a_chr2_ld-1.txt")
 snp_data <- as.matrix(snp_data)
 # function for chisq
 compute_chisquare=function(x){
@@ -96,19 +84,7 @@ abline(a = 0, b = 1, lty = 2, col = "red", lwd = 4)
 
 ```r
 # Part A
-zz <- read.table("pheno.sim.2014-1.txt", header = T) 
-```
-
-```
-## Warning in file(file, "rt"): cannot open file 'pheno.sim.2014-1.txt': No
-## such file or directory
-```
-
-```
-## Error in file(file, "rt"): cannot open the connection
-```
-
-```r
+zz <- read.table("../pheno.sim.2014-1.txt", header = T) 
 head(zz)
 ```
 
