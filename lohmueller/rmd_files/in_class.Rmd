@@ -1,0 +1,28 @@
+---
+title: "Lohmueller in class exercises"
+author: "Gaurav Kandlikar"
+date: "September 17, 2015"
+output: html_document
+---
+
+```{r}
+set.seed(12390)
+s1 <- rnorm(n = 1000, sd = 1, mean = 0)
+s3 <- rnorm(n = 1000, sd = 3, mean = 0)
+
+head(s1); head(s3)
+
+bins <- seq(from = -10, to = 10, by = 1)
+bins
+
+counts_s1 <- hist(s1, breaks = bins)$counts
+counts_s3 <- hist(s3, breaks = bins)$counts
+counts_s1; counts_s3
+
+cols <- c("orange", "purple")
+
+barplot(rbind(counts_s1, counts_s3), beside = T, col = cols, names.arg = seq(from = -10, to = 9.5, by = 1), width = 2)
+legend("topleft", col = cols, pch = 19, 
+       legend = c(expression(paste(sigma, "= 1")), expression(paste(sigma, "= 3"))), bty = "n")
+
+```
