@@ -77,14 +77,14 @@ Convert above logistic growth to a function
 ```{r}
 # The function
 
-logistic_pop_growth <- function(N, rr, generations = 20, K) {
+logistic_pop_growth <- function(N, rr, generations = 20, K, plot = T) {
   pop_sizes <- numeric(generations)
   pop_sizes[1] <- N
   for (time in 2:generations){
     pop_sizes[time] <- pop_sizes[time-1]*(1+rr*(1-pop_sizes[time-1]/K))
   }
   
-  plot(y = pop_sizes, x = 1:generations, type = "l", lwd = 2)
+  if(plot == T) {plot(y = pop_sizes, x = 1:generations, type = "l", lwd = 2)}
   return(pop_sizes)
 }
 
@@ -114,7 +114,7 @@ Bifurcation plot
 ```{r}
 rrs <- seq(from = -1, to = 3, length.out = 100)
 generations <- 100
-trajectories <- sapply(rrs, function(x) logistic_pop_growth(N = 10, K = 100, rr = x, generations = generations))
+trajectories <- sapply(rrs, function(x) logistic_pop_growth(N = 10, K = 100, rr = x, generations = generations, plot = F))
 
 # I think this is what a bifurcation plot is!
 par(mfrow = c(1,1))
