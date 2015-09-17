@@ -233,8 +233,7 @@ head(log_pop_growth)
 ```
 
 ```r
-plot(x = log_pop_growth[, 1], y = log_pop_growth[, 2], type = "l", lwd = 2,
-     xlab = "time", ylab = "population size")
+plot(x = log_pop_growth[, 1], y = log_pop_growth[, 2], type = "l", lwd = 2, xlab = "time", ylab = "population size")
 ```
 
 ![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png) 
@@ -295,14 +294,13 @@ max_growth
 ```r
 # Make a single plot, maybe :o
 par(mfrow = c(1,1), mar = c(5,4,4,4)+0.3)
-plot(x = log_pop_growth[, 1], y = log_pop_growth[, 2], type = "l", lwd = 3,
-     xlab = "time", ylab = "population size", main = "Population with logistic growth")
+plot(x = log_pop_growth[, 1], y = log_pop_growth[, 2], type = "l", lwd = 3, xlab = "time", ylab = "population size", main = "Population with logistic growth")
 par(new = T)
 plot(x = log_pop_growth[, 1], y = log_pop_growth[, 3], type = "l", lwd = 3, xlab = "", ylab = "", axes = F, col = "darkgreen")
 axis(side = 4, at = pretty(range(log_pop_growth[, 3], na.rm = T)))
 mtext(side = 4, "growth rate", line = 3)
-text(15, .012, "growth rate", col = "darkgreen")
-text(80, .012, "population size")
+text(15, .012,  "growth rate", col = "darkgreen")
+text(80, .012,  "population size")
 abline(v = max_growth[, 1], lwd = 2, lty = 2)
 mtext(side = 1, text = paste("Max growth rate occurs when N = ", floor(max_growth[,2]), sep = ""), line = 4)
 ```
@@ -335,3 +333,55 @@ for (ii in rrs) {
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
 
 Compare this to the figure in Exercise 3.3.2, where the population sizes bounced around at higher values of R. This may because converting it to continuous time may make the model respond immediately to being close to the carrying capacity as opposed to responding to some previous time step. **look this up!**
+
+### Exercise 4.2.2
+How will the dynamics of the logistic model be impacted by harvesting (e.g. by fishing or hunting of the population)? A simple model that incorporated a constant per capita risk of being harvested is coded below:
+
+
+```r
+logGrowthHarvestODE <- function(tt, NN, params) { 
+  derivs <- params["rr"]*NN*(1-(NN/params["kk"]))-params["h"]*NN
+  return(list(derivs))  # Return the derivs 
+}
+```
+
+*If you remember how, analyze this model to find its equilibria*  
+
+**Note: still a work in progress, working on this!**
+Attempt:
+`dN/dT = rN*(1-N/K)*(hN) = 0`  
+Equilibrium occurs where dN/dT = 0. This happens in three scenarios (at least, I think?):  
+1. N = 0 (trivial)  
+2. N = K(1-h/r)
+3. h = r(1-N/K)
+
+
+```r
+init <- 10
+tseq <- seq(from = 1, to = 125, by = 0.01)
+
+log_pop_growth_harvest <- lsoda(init, tseq, logGrowthHarvestODE, parameters)
+head(log_pop_growth_harvest)
+```
+
+```
+##      time  1
+## [1,] 1.00 10
+## [2,] 1.01 NA
+## [3,] 1.02 NA
+## [4,] 1.03 NA
+## [5,] 1.04 NA
+## [6,] 1.05 NA
+```
+
+```r
+# Write a function to do sensitivity to h for a given value of r
+
+# Assume r = 0.1
+# 
+# hhs <- seq(from = 0, to = .125, by = 0.005)
+# 
+# sapply(hhs, function(x) print(x))
+# 
+# run_pop_growth_ode(init, tseq, log_pop_growth_harvest, parameters = c("rr = 0.1", "kk" = 100, "h" = x))
+```
