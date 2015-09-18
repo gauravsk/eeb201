@@ -265,7 +265,7 @@ Assess sensitivity of the model to values of `h`:
 
 ```{r}
 parameters <- c(rr = 0.1, kk = 100, hh = 0.01 )
-
+hhs <- seq(from = 0, to = 0.2, by = 0.05)
 par(mfrow = c(2,3))
 for (ii in hhs) {
   parameters["hh"] <- ii
@@ -282,18 +282,17 @@ for (ii in hhs) {
 sensitiv_harvest <- function(hh){
   parameters["hh"] <- hh
   temp <- lsoda(init, tseq, logGrowthHarvestODE, parameters)
-  plot(y = temp[, 2], x = temp[, 1], main = "logistic growth with harvest", lwd = 2, type = "l", ylab = "pop size", xlab = "time")
+  # plot(y = temp[, 2], x = temp[, 1], main = "logistic growth with harvest", lwd = 2, type = "l", ylab = "pop size", xlab = "time")
   return(temp[,2])
 }
 
 # make a vector of hhs and run model over it
-hhs <- seq(from = 0, to = 0.2, by = 0.005)
 sensitivity_to_h <- sapply(hhs, function(x) sensitiv_harvest(x))
 
 plot(y = sensitivity_to_h[nrow(sensitivity_to_h), ], x = hhs, xlab = "h", ylab = "final population size", main = paste("r =", parameters["rr"]), type = "l", lwd = 4)
 
 ```
-This makes sense - as the proportion of individuals harvested increases, the final population size decreases. 
+This makes sense - as the proportion of individuals harvested increases, the final population size decreases. When h > r, the population will go to zero because more is always being harvested than the maximum possible growth rate. 
 
 
 Algebraicly, dN/dT should be 0 when `h = r(1-N/K)`. Let's confirm that this is true. **NOTE: haven't gotten anywhere with this either. Don't bother for now.**
@@ -308,7 +307,7 @@ dNdT_v_h <- function(vec) {
   x_axis_values <- parameters["rr"]*(1-vec/parameters["kk"])
   x_axis_values <- x_axis_values[2:length(x_axis_values)]
   
-  plot(x = x_axis_values, y = dNs)
+  # plot(x = x_axis_values, y = dNs)
 }
 
 placeholder <- apply(sensitivity_to_h, 1, dNdT_v_h)

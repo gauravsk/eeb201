@@ -386,7 +386,7 @@ Assess sensitivity of the model to values of `h`:
 
 ```r
 parameters <- c(rr = 0.1, kk = 100, hh = 0.01 )
-
+hhs <- seq(from = 0, to = 0.2, by = 0.05)
 par(mfrow = c(2,3))
 for (ii in hhs) {
   parameters["hh"] <- ii
@@ -396,7 +396,7 @@ for (ii in hhs) {
 }
 ```
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) ![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-2.png) ![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-3.png) ![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-4.png) ![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-5.png) ![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-6.png) ![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-7.png) 
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
 
 
 
@@ -405,23 +405,18 @@ for (ii in hhs) {
 sensitiv_harvest <- function(hh){
   parameters["hh"] <- hh
   temp <- lsoda(init, tseq, logGrowthHarvestODE, parameters)
-  plot(y = temp[, 2], x = temp[, 1], main = "logistic growth with harvest", lwd = 2, type = "l", ylab = "pop size", xlab = "time")
+  # plot(y = temp[, 2], x = temp[, 1], main = "logistic growth with harvest", lwd = 2, type = "l", ylab = "pop size", xlab = "time")
   return(temp[,2])
 }
 
 # make a vector of hhs and run model over it
-hhs <- seq(from = 0, to = 0.2, by = 0.005)
 sensitivity_to_h <- sapply(hhs, function(x) sensitiv_harvest(x))
-```
 
-![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-2.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-3.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-4.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-5.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-6.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-7.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-8.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-9.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-10.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-11.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-12.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-13.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-14.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-15.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-16.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-17.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-18.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-19.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-20.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-21.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-22.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-23.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-24.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-25.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-26.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-27.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-28.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-29.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-30.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-31.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-32.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-33.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-34.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-35.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-36.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-37.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-38.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-39.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-40.png) ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-41.png) 
-
-```r
 plot(y = sensitivity_to_h[nrow(sensitivity_to_h), ], x = hhs, xlab = "h", ylab = "final population size", main = paste("r =", parameters["rr"]), type = "l", lwd = 4)
 ```
 
-![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-42.png) 
-This makes sense - as the proportion of individuals harvested increases, the final population size decreases. 
+![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png) 
+This makes sense - as the proportion of individuals harvested increases, the final population size decreases. When h > r, the population will go to zero because more is always being harvested than the maximum possible growth rate. 
 
 
 Algebraicly, dN/dT should be 0 when `h = r(1-N/K)`. Let's confirm that this is true. **NOTE: haven't gotten anywhere with this either. Don't bother for now.**
@@ -432,48 +427,13 @@ head(sensitivity_to_h)
 ```
 
 ```
-##          [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]
-## [1,] 10.00000 10.00000 10.00000 10.00000 10.00000 10.00000 10.00000
-## [2,] 10.93669 10.88243 10.82845 10.77472 10.72127 10.66807 10.61514
-## [3,] 11.94945 11.83187 11.71544 11.60015 11.48598 11.37293 11.26099
-## [4,] 13.04227 12.85150 12.66349 12.47820 12.29558 12.11561 11.93824
-## [5,] 14.21890 13.94428 13.67486 13.41057 13.15129 12.89695 12.64746
-## [6,] 15.48279 15.11287 14.75159 14.39877 14.05419 13.71770 13.38910
-##          [,8]     [,9]    [,10]    [,11]    [,12]    [,13]    [,14]
-## [1,] 10.00000 10.00000 10.00000 10.00000 10.00000 10.00000 10.00000
-## [2,] 10.56246 10.51006 10.45790 10.40601 10.35437 10.30299 10.25186
-## [3,] 11.15014 11.04038 10.93168 10.82404 10.71744 10.61191 10.50740
-## [4,] 11.76345 11.59118 11.42140 11.25408 11.08918 10.92667 10.76653
-## [5,] 12.40272 12.16264 11.92714 11.69611 11.46950 11.24722 11.02918
-## [6,] 13.06820 12.75485 12.44886 12.15005 11.85830 11.57342 11.29526
-##         [,15]    [,16]    [,17]    [,18] [,19]     [,20]     [,21]
-## [1,] 10.00000 10.00000 10.00000 10.00000    10 10.000000 10.000000
-## [2,] 10.20099 10.15036 10.09999 10.04987    10  9.950371  9.900986
-## [3,] 10.40391 10.30144 10.19995 10.09949    10  9.901476  9.803918
-## [4,] 10.60871 10.45318 10.29988 10.14886    10  9.853300  9.708727
-## [5,] 10.81532 10.60554 10.39976 10.19796    10  9.805828  9.615376
-## [6,] 11.02366 10.75848 10.49955 10.24680    10  9.759045  9.523801
-##          [,22]     [,23]     [,24]     [,25]     [,26]     [,27]     [,28]
-## [1,] 10.000000 10.000000 10.000000 10.000000 10.000000 10.000000 10.000000
-## [2,]  9.851847  9.802950  9.754303  9.705885  9.657709  9.609773  9.562077
-## [3,]  9.707309  9.611653  9.516937  9.423150  9.330282  9.238318  9.147255
-## [4,]  9.566266  9.425874  9.287524  9.151186  9.016832  8.884429  8.753953
-## [5,]  9.428583  9.245374  9.065682  8.889441  8.716586  8.547049  8.380771
-## [6,]  9.294146  9.069945  8.851070  8.637401  8.428815  8.225189  8.026413
-##          [,29]     [,30]     [,31]     [,32]     [,33]     [,34]     [,35]
-## [1,] 10.000000 10.000000 10.000000 10.000000 10.000000 10.000000 10.000000
-## [2,]  9.514617  9.467393  9.420402  9.373645  9.327119  9.280822  9.234754
-## [3,]  9.057085  8.967798  8.879385  8.791839  8.705151  8.619313  8.534316
-## [4,]  8.625376  8.498670  8.373810  8.250768  8.129518  8.010035  7.892293
-## [5,]  8.217690  8.057746  7.900880  7.747034  7.596152  7.448177  7.303054
-## [6,]  7.832374  7.642963  7.458070  7.277592  7.101425  6.929471  6.761628
-##          [,36]     [,37]     [,38]     [,39]     [,40]     [,41]
-## [1,] 10.000000 10.000000 10.000000 10.000000 10.000000 10.000000
-## [2,]  9.188914  9.143299  9.097910  9.052746  9.007805  8.963087
-## [3,]  8.450154  8.366814  8.284292  8.202580  8.121669  8.041551
-## [4,]  7.776267  7.661933  7.549266  7.438244  7.328840  7.221033
-## [5,]  7.160729  7.021150  6.884265  6.750023  6.618372  6.489265
-## [6,]  6.597801  6.437897  6.281822  6.129488  5.980807  5.835691
+##          [,1]     [,2]      [,3]      [,4]      [,5]
+## [1,] 10.00000 10.00000 10.000000 10.000000 10.000000
+## [2,] 10.93669 10.40601  9.900986  9.420402  8.963087
+## [3,] 11.94945 10.82404  9.803918  8.879385  8.041551
+## [4,] 13.04227 11.25408  9.708727  8.373810  7.221033
+## [5,] 14.21890 11.69611  9.615376  7.900880  6.489265
+## [6,] 15.48279 12.15005  9.523801  7.458070  5.835691
 ```
 
 ```r
@@ -485,10 +445,8 @@ dNdT_v_h <- function(vec) {
   x_axis_values <- parameters["rr"]*(1-vec/parameters["kk"])
   x_axis_values <- x_axis_values[2:length(x_axis_values)]
   
-  plot(x = x_axis_values, y = dNs)
+  # plot(x = x_axis_values, y = dNs)
 }
 
 placeholder <- apply(sensitivity_to_h, 1, dNdT_v_h)
 ```
-
-![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-2.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-3.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-4.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-5.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-6.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-7.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-8.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-9.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-10.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-11.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-12.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-13.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-14.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-15.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-16.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-17.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-18.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-19.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-20.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-21.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-22.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-23.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-24.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-25.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-26.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-27.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-28.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-29.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-30.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-31.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-32.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-33.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-34.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-35.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-36.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-37.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-38.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-39.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-40.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-41.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-42.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-43.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-44.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-45.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-46.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-47.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-48.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-49.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-50.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-51.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-52.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-53.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-54.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-55.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-56.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-57.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-58.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-59.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-60.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-61.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-62.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-63.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-64.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-65.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-66.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-67.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-68.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-69.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-70.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-71.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-72.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-73.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-74.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-75.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-76.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-77.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-78.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-79.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-80.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-81.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-82.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-83.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-84.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-85.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-86.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-87.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-88.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-89.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-90.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-91.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-92.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-93.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-94.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-95.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-96.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-97.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-98.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-99.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-100.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-101.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-102.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-103.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-104.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-105.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-106.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-107.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-108.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-109.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-110.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-111.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-112.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-113.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-114.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-115.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-116.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-117.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-118.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-119.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-120.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-121.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-122.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-123.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-124.png) ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-125.png) 
